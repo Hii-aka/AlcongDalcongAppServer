@@ -1,100 +1,94 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 알콩달콩 (AlcongDalcong) - 커플 다이어리 서버 🖥️
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 소개
+알콩달콩 서버는 NestJS 기반의 백엔드 시스템으로, RESTful API를 제공하며 실시간 데이터 동기화, 인증, 데이터 저장 및 AI 기능을 처리합니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 주요 기능 ⚙️
 
-## Description
+### 1. 인증 및 보안
+- OAuth 2.0 기반 소셜 로그인 (카카오, 애플)
+- JWT 토큰 기반 인증 (@nestjs/jwt)
+- Guards를 통한 인증 미들웨어
+- 데이터 암호화 (bcrypt)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 2. 실시간 데이터 동기화
+- WebSocket (@nestjs/websockets)을 통한 실시간 다이어리 동기화
+- 커플 간 데이터 공유 시스템
+- 이벤트 기반 알림 시스템 (Socket.io)
 
-## Project setup
+### 3. AI 서비스
+- OpenAI API 통합
+- 데이트 코스 추천 알고리즘
+- 사용자 취향 분석 및 학습
 
-```bash
-$ npm install
+### 4. 데이터 관리
+- TypeORM을 활용한 데이터 CRUD
+- AWS S3 기반 미디어 파일 저장
+- 캘린더 이벤트 관리
+- 커플 매칭 시스템
+
+## 기술 스택 🛠
+
+### 핵심 기술
+- Language: TypeScript
+- Framework: NestJS
+- Database: MySQL 8.0
+- ORM: TypeORM
+- Cache: Redis
+
+### 인프라
+- AWS (EC2, S3, RDS)
+- Docker
+- Nginx
+- GitHub Actions (CI/CD)
+
+### 모니터링 & 로깅
+- Winston Logger
+- Prometheus
+- Grafana
+- Sentry
+
+### 테스트
+- Jest
+- SuperTest
+
+## 프로젝트 구조 📁
 ```
+AlcongDalcongServer/
+├── src/
+│ ├── config/
+│ ├── modules/
+│ │ ├── auth/
+│ │ ├── diary/
+│ │ ├── calendar/
+│ │ ├── user/
+│ │ └── recommendation/
+│ ├── common/
+│ │ ├── decorators/
+│ │ ├── filters/
+│ │ ├── guards/
+│ │ ├── interceptors/
+│ │ └── pipes/
+│ ├── entities/
+│ └── utils/
+├── test/
+└── docs/
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+컨벤션
+feat: 새로운 기능 추가
+fix: 버그 수정
+docs: 문서 수정
+style: 코드 포맷팅
+refactor: 코드 리팩토링
+test: 테스트 코드
+chore: 빌드 업무 수정
+🧪
+bash
+유닛 테스트
+npm run test
+e2e 테스트
+npm run test:e2e
+테스트 커버리지
+npm run test:cov
+.
 ```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-# AlcongDalcongAppServer
