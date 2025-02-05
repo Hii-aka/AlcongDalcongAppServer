@@ -43,5 +43,6 @@ export class AuthService {
         }
         return {
             message: '로그인이 완료되었습니다.',
+        };
     }
 }

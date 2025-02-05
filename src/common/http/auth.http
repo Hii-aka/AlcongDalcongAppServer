@@ -1,0 +1,17 @@
+### 회원가입
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+  "email": "test@test.cox",
+  "password": "1234!@#ab3"
+}
+
+### 로그인
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.cox",
+  "password": "1234!@#ab3"
+}
