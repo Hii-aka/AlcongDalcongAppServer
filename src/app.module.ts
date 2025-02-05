@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { WINSTON_MODULE_PROVIDER, WinstonModule } from 'nest-winston';
+import { winstonConfig } from './logger/winston.config';
+import { CustomLogger } from './logger/custom.logger';
+import { Logger } from 'winston';
 
 @Module({
   imports: [
@@ -19,8 +23,18 @@ import { AuthModule } from './auth/auth.module';
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
+    WinstonModule.forRoot(winstonConfig),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: 'LOGGER',
+      useFactory: (logger: Logger) => {
+        return new CustomLogger(logger);
+      },
+      inject: [WINSTON_MODULE_PROVIDER],
+    },
+  ],
+  exports: ['LOGGER'],
 })
 export class AppModule {}
