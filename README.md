@@ -55,24 +55,38 @@
 ## 프로젝트 구조 📁
 ```
 AlcongDalcongServer/
-├── src/
-│ ├── config/
-│ ├── modules/
-│ │ ├── auth/
-│ │ ├── diary/
-│ │ ├── calendar/
-│ │ ├── user/
-│ │ └── recommendation/
-│ ├── common/
-│ │ ├── decorators/
-│ │ ├── filters/
-│ │ ├── guards/
-│ │ ├── interceptors/
-│ │ └── pipes/
-│ ├── entities/
-│ └── utils/
-├── test/
-└── docs/
+src/
+├── main.ts                # 애플리케이션 엔트리 포인트
+├── app.module.ts          # 루트 모듈
+├── config/               # 환경 설정 관련
+│   ├── configuration.ts
+│   └── validation.ts
+├── core/                 # 핵심 기능 모듈
+│   ├── filters/         # 전역 예외 필터
+│   ├── guards/          # 인증/인가 가드
+│   ├── interceptors/    # 전역 인터셉터
+│   ├── decorators/      # 커스텀 데코레이터
+│   └── middlewares/     # 전역 미들웨어
+├── shared/              # 공유 모듈
+│   ├── services/        # 공통 서비스
+│   ├── utils/           # 유틸리티 함수
+│   └── constants/       # 상수
+├── modules/             # 기능별 모듈
+│   ├── users/          # 사용자 모듈 예시
+│   │   ├── dto/       # Data Transfer Objects
+│   │   ├── entities/  # 데이터베이스 엔티티
+│   │   ├── interfaces/ # 타입 정의
+│   │   ├── users.controller.ts
+│   │   ├── users.service.ts
+│   │   └── users.module.ts
+│   └── auth/           # 인증 모듈 예시
+│       ├── dto/
+│       ├── strategies/
+│       ├── auth.controller.ts
+│       ├── auth.service.ts
+│       └── auth.module.ts
+└── test/               # e2e 테스트
+    └── jest-e2e.json
 
 컨벤션
 feat: 새로운 기능 추가
