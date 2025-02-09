@@ -4,7 +4,7 @@ import { AuthDto } from './dto/auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { AppLogFormatter } from 'src/logger/log.formatter';
-
+import { ApiResponseDto } from 'src/api/api.response.dto';
 @Controller('auth')
 export class AuthController {
     private logFormatter: AppLogFormatter;
@@ -20,13 +20,23 @@ export class AuthController {
     async signup(@Body(ValidationPipe) authDto: AuthDto) {
         const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
         this.logger.log(logPayload);
-        return this.authService.signup(authDto);
+        const response = await this.authService.signup(authDto);
+        return ApiResponseDto.success(
+            '회원가입 성공',
+            response,
+            201,
+        );
     }
 
     @Post('/login')
-    login(@Body(ValidationPipe) authDto: AuthDto) {
+    async login(@Body(ValidationPipe) authDto: AuthDto) {
         const logPayload = this.logFormatter.format('login 호출', { dto: authDto });
         this.logger.log(logPayload);
-        return this.authService.login(authDto);
+        const response = await this.authService.login(authDto);
+        return ApiResponseDto.success(
+            '로그인 성공',
+            response,
+            200,
+        );
     }
 }

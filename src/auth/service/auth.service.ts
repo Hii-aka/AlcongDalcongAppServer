@@ -4,12 +4,18 @@ import { User } from '../domain/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UserWithoutPassword } from '../types/auth.type';
+import { LoginServiceResponse } from './types/auth.service.types';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+        private jwtService: JwtService,
+        private configService: ConfigService,
     ) {}
 
     async signup(authDto: AuthDto) {
@@ -31,7 +37,9 @@ export class AuthService {
         };
     }
 
-    async login(authDto: AuthDto) {
+     
+
+    async login(authDto: AuthDto) : Promise<LoginServiceResponse> {
         const { email, password } = authDto;
         const user = await this.userRepository.findOne({ where: { email } });
         if (!user) {
@@ -41,8 +49,37 @@ export class AuthService {
         if (!isPasswordValid) {
             throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
         }
+        const tokens = await this.getTokens({ email });
+        await this.updateHashedRefreshToken(user.id, tokens.refreshToken);
+        const userWithoutPassword = { ...user, hashedRefreshToken: undefined, password: undefined } as unknown as UserWithoutPassword;
         return {
-            message: '로그인이 완료되었습니다.',
+            user: userWithoutPassword,
+            tokens,
         };
+    }
+
+    private async getTokens(payload: {email: string}) {
+        const [accessToken, refreshToken] = await Promise.all([
+            this.jwtService.signAsync(payload, {
+                secret: this.configService.get('JWT_SECRET'),
+                expiresIn: this.configService.get('JWT_EXPIRES_IN'),
+            }),
+            this.jwtService.signAsync(payload, {
+                secret: this.configService.get('JWT_SECRET'),   
+                expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
+            }),
+        ]);
+        return { accessToken, refreshToken };
+    }
+
+    private async updateHashedRefreshToken(id: number, refreshToken: string) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, salt);
+
+        try {
+            await this.userRepository.update(id, {  hashedRefreshToken });
+        } catch (error) {
+            throw new InternalServerErrorException('리프레시 토큰 업데이트 도중 에러가 발생했습니다.');
+        }
     }
 }

@@ -25,6 +25,15 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggingInterceptor(logger));
   app.useGlobalFilters(new GlobalExceptionFilter(logger));
 
+  app.enableCors({
+    origin: ['http://localhost:5173'], // 허용할 도메인 목록
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', // 허용할 HTTP 메서드
+    credentials: true, // 쿠키 허용
+    allowedHeaders: '*', // 허용할 헤더
+    exposedHeaders: 'Authorization', // 클라이언트에 노출할 헤더
+    maxAge: 3600, // preflight 요청 캐시 시간 (초)
+  });
+
   
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Server is running on port ${process.env.PORT ?? 3000}`);
