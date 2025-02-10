@@ -14,6 +14,7 @@ jobs:
           channel-id: 'C08B78BHM7Y'  # 슬랙 채널 ID를 입력하세요
           payload: |
             {
+              "text": "새로운 Pull Request가 열렸습니다",
               "blocks": [
                 {
                   "type": "header",
