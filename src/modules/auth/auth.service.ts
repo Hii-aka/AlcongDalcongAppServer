@@ -10,8 +10,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserWithoutPassword } from './types/auth.type';
 import { LoginServiceResponse } from './types/auth.service.types';
-import { MySQLErrorCode } from 'src/shared/constants';
+import { MySQLErrorCode } from '../../shared/constants';
 import { PrincipalDto } from './dto/principal.dto';
+
 
 @Injectable()
 export class AuthService {
