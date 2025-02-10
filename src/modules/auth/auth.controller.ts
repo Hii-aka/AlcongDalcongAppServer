@@ -3,15 +3,18 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
-import { AppLogFormatter } from 'src/logger/log.formatter';
-import { ApiResponseDto } from 'src/api/api.response.dto';
+import { AppLogFormatter } from '../../logger/log.formatter';
+import { ApiResponseDto } from '../../api/api.response.dto';
 
-import { ApiOperation, ApiBody, ApiResponse, ApiCreatedResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { User } from './entities/user.entity';
+
+import { ApiOperation, ApiBody, ApiCreatedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { LoginUser } from 'src/core/decorators/login-user.decorator';
+import { LoginUser } from '../../core/decorators/login-user.decorator';
 import { PrincipalDto } from './dto/principal.dto';
 @Controller('auth')
+
+
+
 export class AuthController {
     private logFormatter: AppLogFormatter;
 

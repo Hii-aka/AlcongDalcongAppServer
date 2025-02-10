@@ -69,7 +69,6 @@ export class AuthService {
         const { accessToken, refreshToken } = await this.getTokens({ email: principalDto.email });
         await this.updateHashedRefreshToken(principalDto.id, refreshToken);
         return {
-
             accessToken,
             refreshToken,
         };

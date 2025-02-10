@@ -8,9 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 import { MySQLErrorCode } from '../../shared/constants';
-import { UserWithoutPassword } from './types/auth.type';
 import * as bcryptjs from 'bcryptjs';
-import { compare } from 'bcryptjs';
+
+
 
 // bcryptjs 모듈 전체를 모킹
 jest.mock('bcryptjs', () => ({
@@ -38,7 +38,6 @@ describe('AuthService', () => {
     profileImage: null,
     hashedRefreshToken: null,
     createdAt: new Date(2025, 1, 9, 10, 0, 0),  
-
     updatedAt: new Date(2025, 1, 9, 10, 0, 0),
     deletedAt: null,
   };
@@ -157,10 +156,7 @@ describe('AuthService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockUserRepository.update.mockResolvedValue({ affected: 1 });
-      mockJwtService.signAsync.mockResolvedValue({
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
-      });
+      mockJwtService.signAsync.mockResolvedValue('mock-jwt-token');
 
       const result = await authService.login(loginDto);
 
@@ -200,5 +196,24 @@ describe('AuthService', () => {
       await expect(authService.login(loginDto)).rejects.toThrow(new UnauthorizedException('비밀번호가 일치하지 않습니다.'));
     });
   });
-});
 
+  describe('refreshToken', () => {
+    it('리프레시 토큰 갱신 성공시 토큰을 반환해야 함', async () => {
+      const principalDto = {
+        id: 1,
+        email: 'test@test.com',
+        hashedRefreshToken: 'hashed-refresh-token',
+      };  
+
+      mockJwtService.signAsync.mockResolvedValue('mock-jwt-token');
+
+
+      const result = await authService.refreshToken(principalDto);
+     
+      expect(result).toBeDefined();
+      expect(result.accessToken).toBeDefined();
+      expect(result.refreshToken).toBeDefined();
+      expect(mockJwtService.signAsync).toHaveBeenCalled();
+    });
+  });
+});
