@@ -1,5 +1,5 @@
 import { Body, Controller, Inject, Post, ValidationPipe } from '@nestjs/common';
-import { AuthService } from '../service/auth.service';
+import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';

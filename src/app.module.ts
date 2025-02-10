@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { WINSTON_MODULE_PROVIDER, WinstonModule } from 'nest-winston';
 import { winstonConfig } from './logger/winston.config';
 import { CustomLogger } from './logger/custom.logger';
