@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { User } from './entities/user.entity';
@@ -5,6 +6,9 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+
+import { MySQLErrorCode } from '../../shared/constants';
+
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -94,6 +98,22 @@ describe('AuthService', () => {
       expect(mockUserRepository.create).toHaveBeenCalled();
       expect(mockUserRepository.save).toHaveBeenCalled();
 
+    });
+  });
+
+  describe('duplicate email', () => {
+    it('중복된 이메일로 회원가입 시 오류가 발생해야 함', async () => {
+      // Arrange
+      const signUpDto = {
+        email: 'test@test.com',
+        password: 'password123',
+      };
+      mockUserRepository.create.mockReturnValue(mockUser);
+      mockUserRepository.save.mockRejectedValue({ code: MySQLErrorCode.DUPLICATE_ENTRY });
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+
+      // Act & Assert
+      await expect(authService.signup(signUpDto)).rejects.toThrow(ConflictException);
     });
   });
 });
