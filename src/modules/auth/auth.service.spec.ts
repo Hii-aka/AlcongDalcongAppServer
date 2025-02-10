@@ -8,9 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 import { MySQLErrorCode } from '../../shared/constants';
-import { UserWithoutPassword } from './types/auth.type';
 import * as bcryptjs from 'bcryptjs';
-import { compare } from 'bcryptjs';
+
+
 
 // bcryptjs 모듈 전체를 모킹
 jest.mock('bcryptjs', () => ({
@@ -38,7 +38,6 @@ describe('AuthService', () => {
     profileImage: null,
     hashedRefreshToken: null,
     createdAt: new Date(2025, 1, 9, 10, 0, 0),  
-
     updatedAt: new Date(2025, 1, 9, 10, 0, 0),
     deletedAt: null,
   };
