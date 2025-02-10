@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { CommonEntity } from "src/audit/base.entity";
+import { CommonEntity } from "../../../audit/base.entity";
+
 
 @Entity()
 export class User extends CommonEntity {
