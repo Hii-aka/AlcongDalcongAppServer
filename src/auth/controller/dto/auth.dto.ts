@@ -1,9 +1,17 @@
 import { IsString, MaxLength, MinLength, Matches } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class AuthDto {
+    @ApiProperty({
+        description: '이메일',
+        minimum: 6,
+        maximum: 50,
+        example: 'test@test.com',
+    })
     @IsString()
     @MinLength(6,{
         message: '이메일은 최소 6자 이상이어야 합니다.',
+
     })
     @MaxLength(50,{
         message: '이메일은 최대 50자 이하여야 합니다.',
@@ -13,7 +21,14 @@ export class AuthDto {
     })
     email: string;
 
+    @ApiProperty({
+        description: '비밀번호',
+        minimum: 8,
+        maximum: 20,
+        example: 'password1234',
+    })
     @IsString()
+
     @MinLength(8,{
         message: '비밀번호는 최소 8자 이상이어야 합니다.',
     })
