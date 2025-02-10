@@ -1,12 +1,16 @@
-import { Body, Controller, Inject, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Inject, Post, ValidationPipe, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { AppLogFormatter } from 'src/logger/log.formatter';
 import { ApiResponseDto } from 'src/api/api.response.dto';
-import { ApiOperation, ApiBody, ApiResponse, ApiCreatedResponse } from '@nestjs/swagger';
 
+import { ApiOperation, ApiBody, ApiResponse, ApiCreatedResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { User } from './entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { LoginUser } from 'src/core/decorators/login-user.decorator';
+import { PrincipalDto } from './dto/principal.dto';
 @Controller('auth')
 export class AuthController {
     private logFormatter: AppLogFormatter;
@@ -49,5 +53,18 @@ export class AuthController {
             response,
             200,
         );
+    }
+
+    @Get('/refresh')
+    @UseGuards(AuthGuard())
+    @ApiBearerAuth('access-token')
+    @ApiOperation({ summary: '토큰 갱신' })
+    @ApiCreatedResponse({ description: '토큰 갱신 성공' , type: ApiResponseDto})
+    async refresh(@LoginUser() principalDto: PrincipalDto) {
+        const logPayload = this.logFormatter.format('refresh 호출', { principalDto });
+        this.logger.log(logPayload);
+        const response = await this.authService.refreshToken(principalDto);
+
+        return ApiResponseDto.success('토큰 갱신 성공', response, 200);
     }
 }

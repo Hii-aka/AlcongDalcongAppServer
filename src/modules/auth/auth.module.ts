@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/logger/winston.config';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -12,9 +13,11 @@ import { PassportModule } from '@nestjs/passport';
   imports: [
     WinstonModule.forRoot(winstonConfig),
     PassportModule.register({ defaultStrategy: 'jwt' }),
+
     JwtModule.register({}),
     TypeOrmModule.forFeature([User])],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService, JwtStrategy],
+  exports: [JwtStrategy, PassportModule]
 })
 export class AuthModule {}

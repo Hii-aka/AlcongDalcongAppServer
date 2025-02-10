@@ -13,7 +13,17 @@ async function bootstrap() {
     .setDescription('알콩달콩 API 문서')
     .setVersion('1.0')
     .addTag('알콩달콩 API')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'JWT',
+      description: 'Enter JWT token',
+      in: 'header',
+    },
+    'access-token')
     .build();
+
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

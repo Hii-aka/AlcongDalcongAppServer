@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -6,11 +6,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 
+
 import { ConfigService } from '@nestjs/config';
 import { UserWithoutPassword } from './types/auth.type';
 import { LoginServiceResponse } from './types/auth.service.types';
 import { MySQLErrorCode } from 'src/shared/constants';
-
+import { PrincipalDto } from './dto/principal.dto';
 
 @Injectable()
 export class AuthService {
@@ -63,8 +64,20 @@ export class AuthService {
         };
     }
 
+    async refreshToken(principalDto: PrincipalDto): Promise<Record<string, string>> {
+        const { accessToken, refreshToken } = await this.getTokens({ email: principalDto.email });
+        await this.updateHashedRefreshToken(principalDto.id, refreshToken);
+        return {
+
+            accessToken,
+            refreshToken,
+        };
+    }
+
+
     private async getTokens(payload: {email: string}) {
         const [accessToken, refreshToken] = await Promise.all([
+
             this.jwtService.signAsync(payload, {
                 secret: this.configService.get('JWT_SECRET'),
                 expiresIn: this.configService.get('JWT_EXPIRES_IN'),

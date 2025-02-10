@@ -1,0 +1,12 @@
+import { ApiProperty } from "@nestjs/swagger";
+
+export class PrincipalDto {
+    @ApiProperty({ description: '유저 아이디' })    
+    id: number;
+    @ApiProperty({ description: '유저 이메일' })
+    email: string;
+    @ApiProperty({ description: '유저 리프레시 토큰' })
+    hashedRefreshToken: string;
+}
+
+

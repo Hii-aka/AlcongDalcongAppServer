@@ -4,6 +4,7 @@ import { Strategy, ExtractJwt } from "passport-jwt";
 import { User } from "../entities/user.entity"; 
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
+import { PrincipalDto } from "../dto/principal.dto";
 
 @Injectable()
 
@@ -19,12 +20,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: { email: string }) {
+    async validate(payload: { email: string }): Promise<PrincipalDto> {
         const { email } = payload;
         const user = await this.userRepository.findOne({ where: { email } });
         if (!user) {
             throw new UnauthorizedException('존재하지 않는 이메일입니다.');
         }
-        return user;
+        if (!user.hashedRefreshToken) {
+            throw new UnauthorizedException('리프레시 토큰이 존재하지 않습니다.');
+        }
+        return {id: user.id, email: user.email, hashedRefreshToken: user.hashedRefreshToken };
     }   
 }
