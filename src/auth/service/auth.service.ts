@@ -8,11 +8,13 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserWithoutPassword } from '../types/auth.type';
 import { LoginServiceResponse } from './types/auth.service.types';
+import { MySQLErrorCode } from 'src/shared/constants';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
+
         private userRepository: Repository<User>,
         private jwtService: JwtService,
         private configService: ConfigService,
@@ -27,11 +29,12 @@ export class AuthService {
         try {
             await this.userRepository.save(user);
         } catch (error) {
-            if (error.code === '23505') {
+            if (error.code === MySQLErrorCode.DUPLICATE_ENTRY) {
                 throw new ConflictException('이미 존재하는 이메일입니다.');
             }
             throw new InternalServerErrorException('회원가입 도중 에러가 발생했습니다.');
         }
+
         return {
             message: '회원가입이 완료되었습니다.',
         };
