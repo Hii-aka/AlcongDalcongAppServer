@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, ValidationPipe, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post, ValidationPipe, Get, UseGuards, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -51,11 +51,22 @@ export class AuthController {
         this.logger.log(logPayload);
         const response = await this.authService.login(authDto);
         return ApiResponseDto.success(
-
             '로그인 성공',
             response,
             200,
         );
+    }
+
+    @Delete('/logout')
+    @UseGuards(AuthGuard())
+    @ApiBearerAuth('access-token')
+    @ApiOperation({ summary: '로그아웃' })
+    @ApiCreatedResponse({ description: '로그아웃 성공' , type: ApiResponseDto})
+    async logout(@LoginUser() principalDto: PrincipalDto) {
+        const logPayload = this.logFormatter.format('logout 호출', { principalDto });
+        this.logger.log(logPayload);
+        const response = await this.authService.logout(principalDto);
+        return ApiResponseDto.success('로그아웃 성공', response, 200);
     }
 
     @Get('/refresh')
