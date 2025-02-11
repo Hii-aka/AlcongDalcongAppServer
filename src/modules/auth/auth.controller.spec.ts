@@ -47,6 +47,9 @@ describe('AuthController', () => {
           refreshToken: 'mock-refresh-token',
         },
       }),
+      logout: jest.fn().mockResolvedValue({
+        message: '로그아웃 성공',
+      }),
       refreshToken: jest.fn().mockResolvedValue({
         accessToken: 'mock-access-token',
         refreshToken: 'mock-refresh-token',
@@ -109,6 +112,20 @@ describe('AuthController', () => {
     expect(result.data?.user).toBe(mockUserWithoutPassword);
     expect(result.data?.tokens).toBeDefined();
   }); 
+
+  it('로그아웃', async () => {
+    const principalDto: PrincipalDto = {
+      id: 1,
+      email: 'test@test.com',
+      hashedRefreshToken: 'mock-hashed-refresh-token',
+    };
+
+    const result = await controller.logout(principalDto);
+    expect(result).toBeInstanceOf(ApiResponseDto);
+    expect(result.message).toBe('로그아웃 성공');
+    expect(result.statusCode).toBe(200);
+  });
+
 
  
     it('토큰 갱신 성공시 새로운 토큰을 반환해야 합니다', async () => {

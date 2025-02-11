@@ -168,6 +168,29 @@ describe('AuthService', () => {
     });
   });
 
+  describe('logout', () => {
+    it('로그아웃 성공하면 토큰이 삭제되어야 함', async () => {
+      const principalDto = {
+        id: 1,
+        email: 'test@test.com',
+        hashedRefreshToken: 'hashed-refresh-token',   
+      };
+
+      mockUserRepository.update.mockResolvedValue({ affected: 1 });
+
+      const result = await authService.logout(principalDto);  
+
+      // 토큰이 삭제되었는지 확인
+      const updatedUser = await userRepository.findOne({ where: { id: principalDto.id } });
+      expect(updatedUser).not.toBeNull();
+      expect(updatedUser!.hashedRefreshToken).toBeNull();
+      expect(result).toBeDefined();
+      expect(result.message).toBe('로그아웃 성공');
+      expect(mockUserRepository.update).toHaveBeenCalled();
+    });
+  });
+  
+
   describe('invalid email', () => {
     it('존재하지 않는 이메일로 로그인 시 오류가 발생해야 함', async () => {
       const loginDto = {

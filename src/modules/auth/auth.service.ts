@@ -65,6 +65,18 @@ export class AuthService {
         };
     }
 
+
+    async logout(principalDto: PrincipalDto) {
+        try {
+            await this.userRepository.update(principalDto.id, { hashedRefreshToken: undefined });
+        } catch (error) {
+            throw new InternalServerErrorException('로그아웃 도중 에러가 발생했습니다.');
+        }
+        return {
+            message: '로그아웃 성공',
+        };
+    }
+
     async refreshToken(principalDto: PrincipalDto): Promise<Record<string, string>> {
         const { accessToken, refreshToken } = await this.getTokens({ email: principalDto.email });
         await this.updateHashedRefreshToken(principalDto.id, refreshToken);
