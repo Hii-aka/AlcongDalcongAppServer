@@ -6,6 +6,7 @@ import { WINSTON_MODULE_PROVIDER, WinstonModule } from 'nest-winston';
 import { winstonConfig } from './logger/winston.config';
 import { CustomLogger } from './logger/custom.logger';
 import { Logger } from 'winston';
+import { LLMModule } from './modules/llm/llm.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Logger } from 'winston';
       synchronize: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
+    LLMModule,
     WinstonModule.forRoot(winstonConfig),
   ],
   controllers: [],
