@@ -50,10 +50,12 @@ export class LLMClient {
     requestEndpoint: string,
     llmRequest: LLMRequest,
   ): Observable<string> {
-    const url = `${this.baseUrl}${requestEndpoint}`;
-    console.log(llmRequest);
+    const requestUrl = `${this.baseUrl}${requestEndpoint}`;
+    this.logger.log(`LLM Request URL: ${requestUrl}`);
+    this.logger.log('--Request Parameters--', llmRequest);
+
     return this.httpService
-      .post(url, llmRequest, {
+      .post(requestUrl, llmRequest, {
         headers: {
           'Content-Type': 'application/json',
           Accept: 'text/event-stream',
@@ -64,6 +66,7 @@ export class LLMClient {
         switchMap((response: AxiosResponse<Readable>) => {
           const stream = response.data;
           let counter = 0;
+
           return new Observable<string>((observer) => {
             stream.on('data', (chunk: Buffer) => {
               counter++;
@@ -71,6 +74,7 @@ export class LLMClient {
               if (counter % 10 === 0) {
                 this.logger.log(`Received chunk: ${chunkStr}`);
               }
+
               observer.next(chunkStr);
             });
             stream.on('end', () => observer.complete());

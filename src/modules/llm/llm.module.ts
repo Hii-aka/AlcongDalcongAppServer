@@ -8,6 +8,5 @@ import { ConfigModule } from '@nestjs/config';
   imports: [HttpModule, ConfigModule],
   controllers: [LLMController],
   providers: [LLMClient],
-  exports: [LLMClient],
 })
 export class LLMModule {}
