@@ -113,6 +113,7 @@ describe('AuthService', () => {
       const signUpDto = {
         email: 'test@test.com',
         password: 'password123',
+        nickname: 'test',
       };
       mockUserRepository.create.mockReturnValue(mockUser);
       mockUserRepository.save.mockResolvedValue(mockUser);
@@ -137,6 +138,7 @@ describe('AuthService', () => {
       const signUpDto = {
         email: 'test@test.com',
         password: 'password123',
+        nickname: 'test',
       };
       mockUserRepository.create.mockReturnValue(mockUser);
       mockUserRepository.save.mockRejectedValue({ code: MySQLErrorCode.DUPLICATE_ENTRY });
@@ -151,7 +153,8 @@ describe('AuthService', () => {
     it('로그인 성공시 토큰을 반환해야 함', async () => {
       const loginDto = {
         email: 'test@test.com',
-        password: 'password123'
+        password: 'password123',
+        nickname: 'test',
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -195,7 +198,8 @@ describe('AuthService', () => {
     it('존재하지 않는 이메일로 로그인 시 오류가 발생해야 함', async () => {
       const loginDto = {
         email: 'nonexistent@test.com',
-        password: 'password123' 
+        password: 'password123',
+        nickname: 'test',
       };
       mockUserRepository.findOne.mockResolvedValue(null);
 
@@ -210,7 +214,8 @@ describe('AuthService', () => {
     it('비밀번호가 일치하지 않을 때 오류가 발생해야 함', async () => {
       const loginDto = {
         email: 'test@test.com',
-        password: 'wrong-password'
+        password: 'wrong-password',
+        nickname: 'test',
       };
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       // 이 특정 테스트에서만 compare가 false를 반환하도록 설정
