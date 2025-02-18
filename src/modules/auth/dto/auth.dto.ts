@@ -39,4 +39,22 @@ export class AuthDto {
         message: '비밀번호는 영문자, 숫자, 특수문자(!@#$%^&*()_+{}|:"<>?~- 등)로 구성되어야 합니다.',
     })
     password: string;
+
+    @ApiProperty({
+        description: '닉네임',
+        minimum: 2,
+        maximum: 10,
+        example: '닉네임',
+    })  
+    @IsString() 
+    @MinLength(2,{
+        message: '닉네임은 최소 2자 이상이어야 합니다.',
+    })
+    @MaxLength(10,{
+        message: '닉네임은 최대 10자 이하여야 합니다.',
+    })
+    @Matches(/^[a-zA-Z가-힣][a-zA-Z0-9가-힣]*$/,{
+        message: '닉네임은 한글, 영문자, 숫자만 사용 가능하며, 첫 글자는 숫자가 될 수 없습니다.',
+    })
+    nickname: string;
 }

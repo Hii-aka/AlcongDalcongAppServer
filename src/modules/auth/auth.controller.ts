@@ -26,21 +26,54 @@ export class AuthController {
         this.logFormatter = new AppLogFormatter();
     }
 
-    @ApiOperation({ summary: '회원가입' })
+    // @ApiOperation({ summary: '회원가입' })
+    // @ApiBody({ type: AuthDto })
+    // @ApiCreatedResponse({ description: '회원가입 성공' , type: ApiResponseDto})
+    // @Post('/signup')
+    // async signup(@Body(ValidationPipe) authDto: AuthDto) {
+    //     const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
+
+    //     this.logger.log(logPayload);    
+    //     const response = await this.authService.signup(authDto);
+    //     return ApiResponseDto.success(
+    //         '회원가입 성공',
+    //         response,
+    //         201,
+    //     );
+    // }
+
+    @ApiOperation({ summary: '여성 회원가입' })
     @ApiBody({ type: AuthDto })
-    @ApiCreatedResponse({ description: '회원가입 성공' , type: ApiResponseDto})
-    @Post('/signup')
-    async signup(@Body(ValidationPipe) authDto: AuthDto) {
+    @ApiCreatedResponse({ description: '여성 회원가입 성공' , type: ApiResponseDto})
+    @Post('/signup/female')
+    async signupFemale(@Body(ValidationPipe) authDto: AuthDto) {
         const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
 
         this.logger.log(logPayload);    
-        const response = await this.authService.signup(authDto);
+        const response = await this.authService.signupFemale(authDto);
         return ApiResponseDto.success(
-            '회원가입 성공',
+            '여성 회원가입 성공',
             response,
             201,
         );
     }
+
+    @ApiOperation({ summary: '남성 회원가입' })
+    @ApiBody({ type: AuthDto })
+    @ApiCreatedResponse({ description: '남성 회원가입 성공' , type: ApiResponseDto})
+    @Post('/signup/male')
+    async signupMale(@Body(ValidationPipe) authDto: AuthDto) {
+        const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
+
+        this.logger.log(logPayload);    
+        const response = await this.authService.signupMale(authDto);
+        return ApiResponseDto.success(
+            '남성 회원가입 성공',
+            response,
+            201,
+        );
+    }
+
 
     @ApiOperation({ summary: '로그인' })
     @ApiBody({ type: AuthDto })

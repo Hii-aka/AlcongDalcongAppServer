@@ -12,24 +12,28 @@ import { UserWithoutPassword } from './types/auth.type';
 import { LoginServiceResponse } from './types/auth.service.types';
 import { MySQLErrorCode } from '../../shared/constants';
 import { PrincipalDto } from './dto/principal.dto';
-
+import { Male } from './entities/male.entity';
+import { Female } from './entities/female.entity';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
-
         private userRepository: Repository<User>,
+        @InjectRepository(Male)
+        private maleRepository: Repository<Male>,
+        @InjectRepository(Female)
+        private femaleRepository: Repository<Female>,
         private jwtService: JwtService,
         private configService: ConfigService,
     ) {}
 
     async signup(authDto: AuthDto) {
-        const { email, password } = authDto;
+        const { email, password, nickname } = authDto;
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = this.userRepository.create({ email, password: hashedPassword ,loginType: 'email'});
+        const user = this.userRepository.create({ email, password: hashedPassword, nickname, loginType: 'email' });
         try {
             await this.userRepository.save(user);
         } catch (error) {
@@ -41,6 +45,46 @@ export class AuthService {
 
         return {
             message: '회원가입이 완료되었습니다.',
+        };
+    }
+
+    async signupFemale(authDto: AuthDto) {
+        const { email, password, nickname } = authDto;
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const user = this.femaleRepository.create({ email, password: hashedPassword ,loginType: 'email', nickname});
+        try {
+            await this.femaleRepository.save(user);
+        } catch (error) {
+            if (error.code === MySQLErrorCode.DUPLICATE_ENTRY) {
+                throw new ConflictException('이미 존재하는 이메일입니다.');
+            }
+            throw new InternalServerErrorException('회원가입 도중 에러가 발생했습니다.');
+        }
+
+        return {
+            message: '여성 회원가입이 완료되었습니다.',
+        };
+    }
+
+    async signupMale(authDto: AuthDto) {
+        const { email, password, nickname } = authDto;
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const user = this.maleRepository.create({ email, password: hashedPassword, nickname, loginType: 'email' });
+        try {
+            await this.maleRepository.save(user);
+        } catch (error) {
+            if (error.code === MySQLErrorCode.DUPLICATE_ENTRY) {
+                throw new ConflictException('이미 존재하는 이메일입니다.');
+            }
+            throw new InternalServerErrorException('회원가입 도중 에러가 발생했습니다.');
+        }
+
+        return {
+            message: '남성 회원가입이 완료되었습니다.',
         };
     }
 
