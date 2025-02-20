@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 
 
 import { ConfigService } from '@nestjs/config';
-import { UserWithoutPassword } from './types/auth.type';
+import { UserWithoutPassword, UserWithoutPasswordAndHashedRefreshToken } from './types/auth.type';
 import { LoginServiceResponse } from './types/auth-service.types';
 import { PrincipalDto } from './dto/principal.dto';
 import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG } from 'src/constants';
@@ -20,8 +20,8 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
         }
-        const userWithoutPassword = { ...user, password: undefined } as unknown as UserWithoutPassword;
-        return userWithoutPassword;
+        const userWithoutPasswordAndHashedRefreshToken = { ...user, password: undefined, hashedRefreshToken: undefined } as unknown as UserWithoutPasswordAndHashedRefreshToken;
+        return userWithoutPasswordAndHashedRefreshToken;
     }
     constructor(
         @InjectRepository(User)
