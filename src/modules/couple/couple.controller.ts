@@ -9,6 +9,9 @@ import { LoginUser } from 'src/core/decorators/login-user.decorator';
 import { CreateCouleRequestDto } from './dto/create-couple-request.dto';
 import { RespondToCoupleRequestDto } from './dto/respond-to-couple-request.dto';
 import { COUPLE_API_MESSAGES } from 'src/constants/messages/couple';
+import { ApiResponseDto } from 'src/api/api.response.dto';
+import { ApiOperation, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { HTTP_STATUS } from 'src/constants/common/http-status.constant';
 
 @Controller('couples')
 export class CouplesController {
@@ -21,6 +24,9 @@ export class CouplesController {
     this.logFormatter = new AppLogFormatter();
   }
 
+  @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.CREATE_COUPLE_REQUEST })
+  @ApiBody({ type: CreateCouleRequestDto })
+  @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.CREATE_COUPLE_REQUEST, type: ApiResponseDto })
   @Post('request')
   @UseGuards(AuthGuard())
   async createCoupleRequest(
@@ -29,12 +35,20 @@ export class CouplesController {
   ) {
     const logPayload = this.logFormatter.format(COUPLE_API_MESSAGES.SUCCESS.CREATE_COUPLE_REQUEST, { principalDto, dto });
     this.logger.log(logPayload);
-      return this.coupleService.createCoupleRequest(
+    const response = await this.coupleService.createCoupleRequest(
       principalDto.id,
       dto.receiverId
     );
+    return ApiResponseDto.success(
+      COUPLE_API_MESSAGES.SUCCESS.CREATE_COUPLE_REQUEST,
+      response,
+      HTTP_STATUS.SUCCESS.CREATED
+    );
   }
 
+  @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.RESPOND_TO_COUPLE_REQUEST })
+  @ApiBody({ type: RespondToCoupleRequestDto })
+  @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST, type: ApiResponseDto })
   @Post('request/:id/respond')
   @UseGuards(AuthGuard())
   async respondToCoupleRequest(
@@ -44,10 +58,15 @@ export class CouplesController {
   ) {
     const logPayload = this.logFormatter.format(COUPLE_API_MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST, { principalDto, dto });
     this.logger.log(logPayload);
-    return this.coupleService.respondToCoupleRequest(
+    const response = await this.coupleService.respondToCoupleRequest(
       requestId,
       principalDto.id,
       dto.accept
+    );
+    return ApiResponseDto.success(
+      COUPLE_API_MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST,
+      response,
+      HTTP_STATUS.SUCCESS.OK
     );
   }
 }

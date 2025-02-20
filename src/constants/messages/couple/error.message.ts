@@ -8,4 +8,7 @@ export const COUPLE_ERROR_MESSAGES = {
     },
     GENDER_MISMATCH: '성별이 일치하지 않습니다',
     COUPLED: '이미 커플인 상태입니다',
+    SERVER: {
+        INTERNAL_ERROR: '서버 내부 오류가 발생했습니다',
+    },
 }

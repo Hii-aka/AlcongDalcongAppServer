@@ -22,7 +22,7 @@ export class AuthService {
         private configService: ConfigService,
     ) {}
 
-    async signup(authDto: AuthDto) {
+    async signup(authDto: AuthDto): Promise<{ message: string }> {
         const { email, password, nickname } = authDto;
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
