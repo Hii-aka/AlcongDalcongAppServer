@@ -15,6 +15,14 @@ import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG } from '
 
 @Injectable()
 export class AuthService {
+    async getMe(principalDto: PrincipalDto) {
+        const user = await this.userRepository.findOne({ where: { id: principalDto.id } });
+        if (!user) {
+            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
+        }
+        const userWithoutPassword = { ...user, password: undefined } as unknown as UserWithoutPassword;
+        return userWithoutPassword;
+    }
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
