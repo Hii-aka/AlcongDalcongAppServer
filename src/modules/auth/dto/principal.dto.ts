@@ -7,6 +7,8 @@ export class PrincipalDto {
     email: string;
     @ApiProperty({ description: '유저 리프레시 토큰' })
     hashedRefreshToken: string;
+    @ApiProperty({ description: '유저 성별' })
+    gender: string;
 }
 
 

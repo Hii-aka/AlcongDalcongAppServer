@@ -11,10 +11,9 @@ import { ApiOperation, ApiBody, ApiCreatedResponse, ApiBearerAuth } from '@nestj
 import { AuthGuard } from '@nestjs/passport';
 import { LoginUser } from '../../core/decorators/login-user.decorator';
 import { PrincipalDto } from './dto/principal.dto';
+import { AUTH_API_MESSAGES, AUTH_LOG_MESSAGES, HTTP_STATUS } from 'src/constants';
+
 @Controller('auth')
-
-
-
 export class AuthController {
     private logFormatter: AppLogFormatter;
 
@@ -26,92 +25,67 @@ export class AuthController {
         this.logFormatter = new AppLogFormatter();
     }
 
-    // @ApiOperation({ summary: '회원가입' })
-    // @ApiBody({ type: AuthDto })
-    // @ApiCreatedResponse({ description: '회원가입 성공' , type: ApiResponseDto})
-    // @Post('/signup')
-    // async signup(@Body(ValidationPipe) authDto: AuthDto) {
-    //     const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
-
-    //     this.logger.log(logPayload);    
-    //     const response = await this.authService.signup(authDto);
-    //     return ApiResponseDto.success(
-    //         '회원가입 성공',
-    //         response,
-    //         201,
-    //     );
-    // }
-
-    @ApiOperation({ summary: '여성 회원가입' })
+    @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.SIGNUP })
     @ApiBody({ type: AuthDto })
-    @ApiCreatedResponse({ description: '여성 회원가입 성공' , type: ApiResponseDto})
-    @Post('/signup/female')
-    async signupFemale(@Body(ValidationPipe) authDto: AuthDto) {
-        const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
+    @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.SIGNUP , type: ApiResponseDto})
+    @Post('/signup')
+    async signup(@Body(ValidationPipe) dto: AuthDto) {
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.SIGNUP, { dto });
 
         this.logger.log(logPayload);    
-        const response = await this.authService.signupFemale(authDto);
+        const response = await this.authService.signup(dto);
         return ApiResponseDto.success(
-            '여성 회원가입 성공',
+            AUTH_API_MESSAGES.SUCCESS.SIGNUP,
             response,
-            201,
+            HTTP_STATUS.SUCCESS.CREATED,
         );
     }
 
-    @ApiOperation({ summary: '남성 회원가입' })
+    @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.LOGIN })
     @ApiBody({ type: AuthDto })
-    @ApiCreatedResponse({ description: '남성 회원가입 성공' , type: ApiResponseDto})
-    @Post('/signup/male')
-    async signupMale(@Body(ValidationPipe) authDto: AuthDto) {
-        const logPayload = this.logFormatter.format('signup 호출', { dto: authDto });
-
-        this.logger.log(logPayload);    
-        const response = await this.authService.signupMale(authDto);
-        return ApiResponseDto.success(
-            '남성 회원가입 성공',
-            response,
-            201,
-        );
-    }
-
-
-    @ApiOperation({ summary: '로그인' })
-    @ApiBody({ type: AuthDto })
-    @ApiCreatedResponse({ description: '로그인 성공' , type: ApiResponseDto})
-    @Post('/login')
-    async login(@Body(ValidationPipe) authDto: AuthDto) {
-        const logPayload = this.logFormatter.format('login 호출', { dto: authDto });
+    @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.LOGIN , type: ApiResponseDto})
+    @Post('/login') 
+    async login(@Body(ValidationPipe) dto: AuthDto) {
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.LOGIN, { dto });
         this.logger.log(logPayload);
-        const response = await this.authService.login(authDto);
+        const response = await this.authService.login(dto);
         return ApiResponseDto.success(
-            '로그인 성공',
+            AUTH_API_MESSAGES.SUCCESS.LOGIN,
             response,
-            200,
+            HTTP_STATUS.SUCCESS.OK,
         );
     }
 
     @Delete('/logout')
     @UseGuards(AuthGuard())
     @ApiBearerAuth('access-token')
-    @ApiOperation({ summary: '로그아웃' })
-    @ApiCreatedResponse({ description: '로그아웃 성공' , type: ApiResponseDto})
+    @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.LOGOUT })
+    @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.LOGOUT , type: ApiResponseDto})
     async logout(@LoginUser() principalDto: PrincipalDto) {
-        const logPayload = this.logFormatter.format('logout 호출', { principalDto });
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.LOGOUT, { principalDto });
         this.logger.log(logPayload);
         const response = await this.authService.logout(principalDto);
-        return ApiResponseDto.success('로그아웃 성공', response, 200);
+        return ApiResponseDto.success(
+            AUTH_API_MESSAGES.SUCCESS.LOGOUT,
+            response,
+            HTTP_STATUS.SUCCESS.OK,
+        );
     }
 
     @Get('/refresh')
     @UseGuards(AuthGuard())
     @ApiBearerAuth('access-token')
-    @ApiOperation({ summary: '토큰 갱신' })
-    @ApiCreatedResponse({ description: '토큰 갱신 성공' , type: ApiResponseDto})
+    @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.TOKEN_REFRESH })
+    @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.TOKEN_REFRESH , type: ApiResponseDto})
     async refresh(@LoginUser() principalDto: PrincipalDto) {
-        const logPayload = this.logFormatter.format('refresh 호출', { principalDto });
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.REFRESH, { principalDto });
         this.logger.log(logPayload);
         const response = await this.authService.refreshToken(principalDto);
 
-        return ApiResponseDto.success('토큰 갱신 성공', response, 200);
+        return ApiResponseDto.success(
+            AUTH_API_MESSAGES.SUCCESS.TOKEN_REFRESH,
+            response,
+            HTTP_STATUS.SUCCESS.OK,
+        );
     }
 }
