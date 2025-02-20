@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CoupleRequest } from './couple-request.entity';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { User } from '../auth/user.entity';
 import { CoupleRequestStatus } from './enums/couple-request-status.enum';
 import { CoupleStatus } from './enums/couple-status.enum';
 import { COUPLE_ERROR_MESSAGES } from 'src/constants/messages/couple/error.message';
+import { COUPLE_SERVICE } from 'src/constants/messages/couple/service.message';
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class CoupleService {
   ) {}
 
   // 커플 신청
-  async createCoupleRequest(senderId: number, receiverId: number) {
+  async createCoupleRequest(senderId: number, receiverId: number): Promise<{ message: string }> {
     // 유효성 검사
     const [sender, receiver] = await Promise.all([
       this.userRepository.findOneBy({ id: senderId }),
@@ -53,7 +54,15 @@ export class CoupleService {
       status: CoupleRequestStatus.PENDING
     });
 
-    return this.coupleRequestRepository.save(request);
+    try {
+      await this.coupleRequestRepository.save(request);
+    } catch (error) {
+      throw new InternalServerErrorException(COUPLE_ERROR_MESSAGES.SERVER.INTERNAL_ERROR);
+    }
+
+    return {
+      message: COUPLE_SERVICE.MESSAGES.SUCCESS.CREATE_COUPLE_REQUEST,
+    };
   }
 
   // 커플 요청 수락/거절
@@ -61,7 +70,7 @@ export class CoupleService {
     requestId: number, 
     receiverId: number,
     accept: boolean
-  ) {
+  ): Promise<{ message: string }> {
     const coupleRequest = await this.coupleRequestRepository.findOne({
       where: { 
         id: requestId,
@@ -88,6 +97,14 @@ export class CoupleService {
       );
     }
 
-    return this.coupleRequestRepository.save(coupleRequest);
+    try {
+      await this.coupleRequestRepository.save(coupleRequest);
+    } catch (error) {
+      throw new InternalServerErrorException(COUPLE_ERROR_MESSAGES.SERVER.INTERNAL_ERROR);
+    }
+
+    return {
+      message: COUPLE_SERVICE.MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST,
+    };
   }
 }
