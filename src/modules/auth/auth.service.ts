@@ -31,11 +31,11 @@ export class AuthService {
     ) {}
 
     async signup(authDto: AuthDto): Promise<{ message: string }> {
-        const { email, password, nickname } = authDto;
+        const { email, password, nickname, gender } = authDto;
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = this.userRepository.create({ email, password: hashedPassword, nickname, loginType: AUTH_CONFIG.LOGIN_TYPES.EMAIL });
+        const user = this.userRepository.create({ email, password: hashedPassword, nickname, loginType: AUTH_CONFIG.LOGIN_TYPES.EMAIL, gender });
         try {
             await this.userRepository.save(user);
         } catch (error) {
