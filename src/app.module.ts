@@ -7,6 +7,7 @@ import { winstonConfig } from './logger/winston.config';
 import { CustomLogger } from './logger/custom.logger';
 import { Logger } from 'winston';
 import { LLMModule } from './modules/llm/llm.module';
+import { CoupleModule } from './modules/couple/couple.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LLMModule } from './modules/llm/llm.module';
     }),
     AuthModule,
     LLMModule,
+    CoupleModule,
     WinstonModule.forRoot(winstonConfig),
   ],
   controllers: [],
