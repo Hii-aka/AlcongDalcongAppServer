@@ -72,6 +72,22 @@ export class AuthController {
         );
     }
 
+    @Get('/me')
+    @UseGuards(AuthGuard())
+    @ApiBearerAuth('access-token')
+    @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.ME })
+    @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.ME , type: ApiResponseDto})
+    async me(@LoginUser() principalDto: PrincipalDto) {
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.ME, { principalDto });
+        this.logger.log(logPayload);
+        const response = await this.authService.getMe(principalDto);
+        return ApiResponseDto.success(
+            AUTH_API_MESSAGES.SUCCESS.ME,
+            response,
+            HTTP_STATUS.SUCCESS.OK,
+        );
+    }
+
     @Get('/refresh')
     @UseGuards(AuthGuard())
     @ApiBearerAuth('access-token')

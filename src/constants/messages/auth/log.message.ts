@@ -6,6 +6,7 @@ export const AUTH_LOG_MESSAGES = {
       REFRESH: 'refresh 호출',
       PASSWORD_RESET: 'password reset 호출',
       EMAIL_VERIFY: 'email verify 호출',
+      ME: 'me 호출',
     },
     SERVICE: {
       USER_CREATED: '사용자 생성 완료',
