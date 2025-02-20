@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { LoginUser } from '../../core/decorators/login-user.decorator';
 import { PrincipalDto } from './dto/principal.dto';
 import { AUTH_API_MESSAGES, AUTH_LOG_MESSAGES, HTTP_STATUS } from 'src/constants';
+import { LoginRequestDto } from './dto/login-request.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -42,10 +43,10 @@ export class AuthController {
     }
 
     @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.LOGIN })
-    @ApiBody({ type: AuthDto })
+    @ApiBody({ type: LoginRequestDto })
     @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.LOGIN , type: ApiResponseDto})
     @Post('/login') 
-    async login(@Body(ValidationPipe) dto: AuthDto) {
+    async login(@Body(ValidationPipe) dto: LoginRequestDto) {
         const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.LOGIN, { dto });
         this.logger.log(logPayload);
         const response = await this.authService.login(dto);

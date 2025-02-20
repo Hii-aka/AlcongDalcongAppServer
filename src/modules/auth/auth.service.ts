@@ -12,6 +12,7 @@ import { UserWithoutPassword, UserWithoutPasswordAndHashedRefreshToken } from '.
 import { LoginServiceResponse } from './types/auth-service.types';
 import { PrincipalDto } from './dto/principal.dto';
 import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG } from 'src/constants';
+import { LoginRequestDto } from './dto/login-request.dto';
 
 @Injectable()
 export class AuthService {
@@ -50,8 +51,8 @@ export class AuthService {
         };
     }
 
-    async login(authDto: AuthDto) : Promise<LoginServiceResponse> {
-        const { email, password } = authDto;
+    async login(loginRequestDto: LoginRequestDto) : Promise<LoginServiceResponse> {
+        const { email, password } = loginRequestDto;
         const user = await this.userRepository.findOne({ where: { email } });
         if (!user) {
             throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.EMAIL_NOT_FOUND);
