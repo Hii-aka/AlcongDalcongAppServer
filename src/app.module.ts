@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
@@ -8,6 +9,7 @@ import { CustomLogger } from './logger/custom.logger';
 import { Logger } from 'winston';
 import { LLMModule } from './modules/llm/llm.module';
 import { CoupleModule } from './modules/couple/couple.module';
+import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [
@@ -38,6 +40,10 @@ import { CoupleModule } from './modules/couple/couple.module';
       },
       inject: [WINSTON_MODULE_PROVIDER],
     },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    }
   ],
   exports: ['LOGGER'],
 })

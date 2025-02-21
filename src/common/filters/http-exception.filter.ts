@@ -26,25 +26,45 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const errorResponse = {
+    // 클라이언트에 전달할 응답
+    const clientResponse = {
       statusCode: status,
+      message: this.getErrorMessage(exception),
+    };
+
+    // 서버 로깅을 위한 상세 정보
+    const loggerResponse = {
+      ...clientResponse,
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
-      message: exception.message || 'Internal server error',
-    };
-
-    // 에러 로깅
-    this.logger.error('Exception occurred', {
-      ...errorResponse,
       stack: exception.stack,
       headers: request.headers,
       query: request.query,
       body: request.body,
-    });
+    };
+
+    // 에러 로깅
+    this.logger.error('Exception occurred', loggerResponse);
 
     response
       .status(status)
-      .json(errorResponse);
+      .json(clientResponse);
+  }
+
+  private getErrorMessage(exception: Error): string {
+    if (exception instanceof HttpException) {
+      const response = exception.getResponse() as any;
+      // class-validator 에러 처리
+      if (Array.isArray(response.message)) {
+        return response.message[0];
+      }
+      return response.message || exception.message;
+    }
+    
+    // 프로덕션 환경에서는 상세 에러 메시지 숨기기
+    return process.env.NODE_ENV === 'production' 
+      ? '서버에 문제가 발생했습니다.' 
+      : exception.message;
   }
 } 
