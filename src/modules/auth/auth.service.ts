@@ -13,17 +13,8 @@ import { LoginServiceResponse } from './types/auth-service.types';
 import { PrincipalDto } from './dto/principal.dto';
 import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG } from 'src/constants';
 import { LoginRequestDto } from './dto/login-request.dto';
-
 @Injectable()
 export class AuthService {
-    async getMe(principalDto: PrincipalDto) {
-        const user = await this.userRepository.findOne({ where: { id: principalDto.id } });
-        if (!user) {
-            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
-        }
-        const userWithoutPasswordAndHashedRefreshToken = { ...user, password: undefined, hashedRefreshToken: undefined } as unknown as UserWithoutPasswordAndHashedRefreshToken;
-        return userWithoutPasswordAndHashedRefreshToken;
-    }
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
@@ -31,12 +22,33 @@ export class AuthService {
         private configService: ConfigService,
     ) {}
 
+
+    async getMe(principalDto: PrincipalDto) {
+        const user = await this.userRepository.findOne({ where: { id: principalDto.id } });
+        if (!user) {
+            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
+        }
+
+        const userWithoutPasswordAndHashedRefreshToken = { ...user, 
+                                                           password: undefined, 
+                                                           hashedRefreshToken: undefined 
+                                                        } as unknown as UserWithoutPasswordAndHashedRefreshToken;
+
+        return userWithoutPasswordAndHashedRefreshToken;
+    }
+    
+
     async signup(authDto: AuthDto): Promise<{ message: string }> {
         const { email, password, nickname, gender } = authDto;
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = this.userRepository.create({ email, password: hashedPassword, nickname, loginType: AUTH_CONFIG.LOGIN_TYPES.EMAIL, gender });
+        const user = this.userRepository.create({ email, 
+                                                  password: hashedPassword, 
+                                                  nickname, 
+                                                  loginType: AUTH_CONFIG.LOGIN_TYPES.EMAIL, 
+                                                  gender 
+                                                }); 
         try {
             await this.userRepository.save(user);
         } catch (error) {
@@ -58,12 +70,18 @@ export class AuthService {
             throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.EMAIL_NOT_FOUND);
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        
         if (!isPasswordValid) {
             throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.INVALID_PASSWORD);
         }
+
         const tokens = await this.getTokens({ email });
         await this.updateHashedRefreshToken(user.id, tokens.refreshToken);
-        const userWithoutPassword = { ...user, hashedRefreshToken: undefined, password: undefined } as unknown as UserWithoutPassword;
+        const userWithoutPassword = { ...user, 
+                                      hashedRefreshToken: undefined, 
+                                      password: undefined 
+                                    } as unknown as UserWithoutPassword;
+
         return {
             user: userWithoutPassword,
             tokens,
@@ -85,6 +103,7 @@ export class AuthService {
     async refreshToken(principalDto: PrincipalDto): Promise<Record<string, string>> {
         const { accessToken, refreshToken } = await this.getTokens({ email: principalDto.email });
         await this.updateHashedRefreshToken(principalDto.id, refreshToken);
+
         return {
             accessToken,
             refreshToken,

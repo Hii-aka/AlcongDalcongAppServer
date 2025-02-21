@@ -108,4 +108,58 @@ export class CoupleService {
       message: COUPLE_SERVICE.MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST,
     };
   }
+
+  async getCoupleRequest(userId: number): Promise<CoupleRequest> {
+    const couple = await this.coupleRequestRepository
+      .createQueryBuilder('coupleRequest')
+      .leftJoinAndSelect('coupleRequest.sender', 'sender')
+      .leftJoinAndSelect('coupleRequest.receiver', 'receiver')
+      .where('(sender.id = :userId OR receiver.id = :userId)', { userId })
+      .andWhere('coupleRequest.status = :status', { 
+        status: CoupleRequestStatus.PENDING 
+      })
+      .select([
+        'coupleRequest',
+        'sender.id',
+        'sender.email',
+        'sender.nickname',
+        'receiver.id',
+        'receiver.email',
+        'receiver.nickname',
+      ])
+      .getOne();
+
+    if (!couple) {
+      throw new NotFoundException(COUPLE_ERROR_MESSAGES.REQUEST.NOT_FOUND);
+    }
+
+    return couple;
+  }
+
+  async getCouple(userId: number): Promise<CoupleRequest> {
+    const couple = await this.coupleRequestRepository
+      .createQueryBuilder('coupleRequest')
+      .leftJoinAndSelect('coupleRequest.sender', 'sender')
+      .leftJoinAndSelect('coupleRequest.receiver', 'receiver')
+      .where('(sender.id = :userId OR receiver.id = :userId)', { userId })
+      .andWhere('coupleRequest.status = :status', { 
+        status: CoupleRequestStatus.ACCEPTED 
+      })
+      .select([ 
+        'coupleRequest',
+        'sender.id',
+        'sender.email',
+        'sender.nickname',
+        'receiver.id',
+        'receiver.email',
+        'receiver.nickname',
+      ])
+      .getOne();
+
+    if (!couple) {
+      throw new NotFoundException(COUPLE_ERROR_MESSAGES.REQUEST.NOT_FOUND);
+    }
+
+    return couple;
+  }
 }

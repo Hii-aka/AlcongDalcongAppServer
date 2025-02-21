@@ -1,4 +1,4 @@
-import { Controller, Param, Post, UseGuards, Request as Req, Body, Inject } from '@nestjs/common';
+import { Controller, Param, Post, UseGuards, Request as Req, Body, Inject, Get } from '@nestjs/common';
 import { CoupleService } from './couple.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AppLogFormatter } from 'src/logger/log.formatter';
@@ -10,7 +10,7 @@ import { CreateCouleRequestDto } from './dto/create-couple-request.dto';
 import { RespondToCoupleRequestDto } from './dto/respond-to-couple-request.dto';
 import { COUPLE_API_MESSAGES } from 'src/constants/messages/couple';
 import { ApiResponseDto } from 'src/api/api.response.dto';
-import { ApiOperation, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiBody, ApiCreatedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { HTTP_STATUS } from 'src/constants/common/http-status.constant';
 
 @Controller('couples')
@@ -65,6 +65,24 @@ export class CouplesController {
     );
     return ApiResponseDto.success(
       COUPLE_API_MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST,
+      response,
+      HTTP_STATUS.SUCCESS.OK
+    );
+  }
+
+  @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.GET_COUPLE })
+  @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE, type: ApiResponseDto })
+  @ApiBearerAuth('access-token')
+  @Get('')
+  @UseGuards(AuthGuard())
+  async getCouple(
+    @LoginUser() principalDto: PrincipalDto
+  ) {
+    const logPayload = this.logFormatter.format(COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE, { principalDto });
+    this.logger.log(logPayload);
+    const response = await this.coupleService.getCoupleRequest(principalDto.id);
+    return ApiResponseDto.success(
+      COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE,
       response,
       HTTP_STATUS.SUCCESS.OK
     );
