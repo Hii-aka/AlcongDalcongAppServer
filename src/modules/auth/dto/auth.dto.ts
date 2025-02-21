@@ -1,6 +1,8 @@
-import { IsString, MaxLength, MinLength, Matches } from "class-validator";
+import { IsString, MaxLength, MinLength, Matches, IsEnum } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { REGEX_PATTERNS } from "src/constants";
+import { Gender } from "src/modules/couple/enums/gender.enum";
+
 export class AuthDto {
     @ApiProperty({
         description: '이메일',
@@ -60,8 +62,8 @@ export class AuthDto {
 
     @ApiProperty({
         description: '성별',
-        example: 'male',
+        example: 'MALE',
     })
-    @IsString()
-    gender: string;
+    @IsEnum(Gender)
+    gender: Gender;
 }

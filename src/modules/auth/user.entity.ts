@@ -1,8 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { CommonEntity } from "../../audit/base.entity";
 import { CoupleStatus } from "../couple/enums/couple-status.enum";
-
-
+import { Gender } from "../couple/enums/gender.enum";
 @Entity()
 export class User extends CommonEntity {
     @PrimaryGeneratedColumn()
@@ -23,8 +22,12 @@ export class User extends CommonEntity {
     @Column({ nullable: true })
     profileImage?: string;
 
-    @Column()
-    gender: string; 
+    @Column({
+        type: 'enum',
+        enum: Gender,
+        default: Gender.MALE
+    })
+    gender: Gender; 
 
     @Column({
         type: 'enum',
