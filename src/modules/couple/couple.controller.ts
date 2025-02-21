@@ -37,7 +37,7 @@ export class CouplesController {
     this.logger.log(logPayload);
     const response = await this.coupleService.createCoupleRequest(
       principalDto.id,
-      dto.receiverId
+      dto
     );
     return ApiResponseDto.success(
       COUPLE_API_MESSAGES.SUCCESS.CREATE_COUPLE_REQUEST,

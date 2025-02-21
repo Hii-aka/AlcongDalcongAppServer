@@ -22,6 +22,12 @@ export class CoupleRequest {
   })
   status: CoupleRequestStatus;
 
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  firstMetDate?: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

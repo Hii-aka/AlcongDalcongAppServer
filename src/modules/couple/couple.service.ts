@@ -7,7 +7,7 @@ import { CoupleRequestStatus } from './enums/couple-request-status.enum';
 import { CoupleStatus } from './enums/couple-status.enum';
 import { COUPLE_ERROR_MESSAGES } from 'src/constants/messages/couple/error.message';
 import { COUPLE_SERVICE } from 'src/constants/messages/couple/service.message';
-
+import { CreateCouleRequestDto } from './dto/create-couple-request.dto';
 
 @Injectable()
 export class CoupleService {
@@ -19,11 +19,11 @@ export class CoupleService {
   ) {}
 
   // 커플 신청
-  async createCoupleRequest(senderId: number, receiverId: number): Promise<{ message: string }> {
+  async createCoupleRequest(senderId: number, { receiverEmail, firstMetDate }: CreateCouleRequestDto): Promise<{ message: string }> {
     // 유효성 검사
     const [sender, receiver] = await Promise.all([
       this.userRepository.findOneBy({ id: senderId }),
-      this.userRepository.findOneBy({ id: receiverId })
+      this.userRepository.findOneBy({ email: receiverEmail })
     ]);
 
     if (!sender || !receiver) {
@@ -38,8 +38,8 @@ export class CoupleService {
     // 이미 커플인지 체크
     const existingRequest = await this.coupleRequestRepository.findOne({
       where: [
-        { sender: { id: senderId }, receiver: { id: receiverId } },
-        { sender: { id: receiverId }, receiver: { id: senderId } }
+        { sender: { id: senderId }, receiver: { id: receiver.id } },
+        { sender: { id: receiver.id }, receiver: { id: senderId } }
       ]
     });
 
@@ -51,7 +51,8 @@ export class CoupleService {
     const request = this.coupleRequestRepository.create({
       sender,
       receiver,
-      status: CoupleRequestStatus.PENDING
+      status: CoupleRequestStatus.PENDING,
+      firstMetDate: new Date(firstMetDate)
     });
 
     try {
