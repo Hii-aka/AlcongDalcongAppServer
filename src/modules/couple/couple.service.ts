@@ -8,7 +8,7 @@ import { CoupleStatus } from './enums/couple-status.enum';
 import { COUPLE_ERROR_MESSAGES } from 'src/constants/messages/couple/error.message';
 import { COUPLE_SERVICE } from 'src/constants/messages/couple/service.message';
 import { CreateCouleRequestDto } from './dto/create-couple-request.dto';
-
+import { CoupleResponseDto } from './dto/couple-response.dto';
 @Injectable()
 export class CoupleService {
   constructor(
@@ -109,8 +109,8 @@ export class CoupleService {
     };
   }
 
-  async getCoupleRequest(userId: number): Promise<CoupleRequest> {
-    const couple = await this.coupleRequestRepository
+  async getCoupleRequestPending(userId: number): Promise<CoupleResponseDto[]> {
+    const coupleRequests = await this.coupleRequestRepository
       .createQueryBuilder('coupleRequest')
       .leftJoinAndSelect('coupleRequest.sender', 'sender')
       .leftJoinAndSelect('coupleRequest.receiver', 'receiver')
@@ -127,16 +127,33 @@ export class CoupleService {
         'receiver.email',
         'receiver.nickname',
       ])
-      .getOne();
-
-    if (!couple) {
+      .getMany();
+    if (coupleRequests.length < 1) {
       throw new NotFoundException(COUPLE_ERROR_MESSAGES.REQUEST.NOT_FOUND);
     }
 
-    return couple;
+    return coupleRequests.map(coupleRequest => {
+      return {
+        id: coupleRequest.id,
+        sender: {
+          id: coupleRequest.sender.id,
+          email: coupleRequest.sender.email,
+          nickname: coupleRequest.sender.nickname || '',
+        },
+        receiver: {
+          id: coupleRequest.receiver.id,
+          email: coupleRequest.receiver.email,
+          nickname: coupleRequest.receiver.nickname || '' ,
+        },
+        status: coupleRequest.status,
+        firstMetDate: coupleRequest.firstMetDate,
+        createdAt: coupleRequest.createdAt,
+        updatedAt: coupleRequest.updatedAt,
+      };
+    });
   }
 
-  async getCouple(userId: number): Promise<CoupleRequest> {
+  async getCoupleAccepted(userId: number): Promise<CoupleResponseDto> {
     const couple = await this.coupleRequestRepository
       .createQueryBuilder('coupleRequest')
       .leftJoinAndSelect('coupleRequest.sender', 'sender')
@@ -160,6 +177,22 @@ export class CoupleService {
       throw new NotFoundException(COUPLE_ERROR_MESSAGES.REQUEST.NOT_FOUND);
     }
 
-    return couple;
+    return {
+      id: couple.id,
+      sender: {
+        id: couple.sender.id,
+        email: couple.sender.email,
+        nickname: couple.sender.nickname || '',
+      },
+      receiver: {
+        id: couple.receiver.id,
+        email: couple.receiver.email,
+        nickname: couple.receiver.nickname || '',
+      },
+      status: couple.status,
+      firstMetDate: couple.firstMetDate,
+      createdAt: couple.createdAt,
+      updatedAt: couple.updatedAt,
+    };
   }
 }
