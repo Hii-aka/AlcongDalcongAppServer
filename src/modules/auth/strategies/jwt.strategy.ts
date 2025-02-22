@@ -7,8 +7,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { PrincipalDto } from "../dto/principal.dto";
 
 @Injectable()
-
-
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
         @InjectRepository(User)

@@ -70,19 +70,37 @@ export class CouplesController {
     );
   }
 
-  @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.GET_COUPLE })
-  @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE, type: ApiResponseDto })
+  @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.GET_COUPLE_REQUEST_PENDING })
+  @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_REQUEST_PENDING, type: ApiResponseDto })
   @ApiBearerAuth('access-token')
-  @Get('')
+  @Get('request/pending')
   @UseGuards(AuthGuard())
-  async getCouple(
+  async getCoupleRequestPending(
+    @LoginUser() principalDto: PrincipalDto,
+  ) {
+    const logPayload = this.logFormatter.format(COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_REQUEST_PENDING, { principalDto });
+    this.logger.log(logPayload);
+    const response = await this.coupleService.getCoupleRequestPending(principalDto.id);
+    return ApiResponseDto.success(
+      COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_REQUEST_PENDING,
+      response,
+      HTTP_STATUS.SUCCESS.OK
+    );
+  }
+
+  @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.GET_COUPLE_ACCEPTED })
+  @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_ACCEPTED, type: ApiResponseDto })
+  @ApiBearerAuth('access-token')
+  @Get('request/accepted')
+  @UseGuards(AuthGuard())
+  async getCoupleAccepted(
     @LoginUser() principalDto: PrincipalDto
   ) {
-    const logPayload = this.logFormatter.format(COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE, { principalDto });
+    const logPayload = this.logFormatter.format(COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_ACCEPTED, { principalDto });
     this.logger.log(logPayload);
-    const response = await this.coupleService.getCoupleRequest(principalDto.id);
+    const response = await this.coupleService.getCoupleAccepted(principalDto.id);
     return ApiResponseDto.success(
-      COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE,
+      COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_ACCEPTED,
       response,
       HTTP_STATUS.SUCCESS.OK
     );

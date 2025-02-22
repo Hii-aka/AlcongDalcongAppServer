@@ -24,9 +24,8 @@ export class CoupleRequest {
 
   @Column({
     type: 'date',
-    nullable: true,
   })
-  firstMetDate?: Date;
+  firstMetDate: Date;
 
   @CreateDateColumn()
   createdAt: Date;
