@@ -12,9 +12,9 @@ import { COUPLE_API_MESSAGES } from 'src/constants/messages/couple';
 import { ApiResponseDto } from 'src/api/api.response.dto';
 import { ApiOperation, ApiBody, ApiCreatedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { HTTP_STATUS } from 'src/constants/common/http-status.constant';
-
+import { SWAGGER_CONSTANTS } from 'src/constants/common/swagger.constant';
 @Controller('couples')
-export class CouplesController {
+export class CoupleController {
   private logFormatter: AppLogFormatter;
 
   constructor(
@@ -27,6 +27,7 @@ export class CouplesController {
   @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.CREATE_COUPLE_REQUEST })
   @ApiBody({ type: CreateCouleRequestDto })
   @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.CREATE_COUPLE_REQUEST, type: ApiResponseDto })
+  @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
   @Post('request')
   @UseGuards(AuthGuard())
   async createCoupleRequest(
@@ -49,6 +50,7 @@ export class CouplesController {
   @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.RESPOND_TO_COUPLE_REQUEST })
   @ApiBody({ type: RespondToCoupleRequestDto })
   @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST, type: ApiResponseDto })
+  @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
   @Post('request/:id/respond')
   @UseGuards(AuthGuard())
   async respondToCoupleRequest(
@@ -72,7 +74,7 @@ export class CouplesController {
 
   @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.GET_COUPLE_REQUEST_PENDING })
   @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_REQUEST_PENDING, type: ApiResponseDto })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
   @Get('request/pending')
   @UseGuards(AuthGuard())
   async getCoupleRequestPending(
@@ -90,7 +92,7 @@ export class CouplesController {
 
   @ApiOperation({ summary: COUPLE_API_MESSAGES.DESCRIPTION.GET_COUPLE_ACCEPTED })
   @ApiCreatedResponse({ description: COUPLE_API_MESSAGES.SUCCESS.GET_COUPLE_ACCEPTED, type: ApiResponseDto })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
   @Get('request/accepted')
   @UseGuards(AuthGuard())
   async getCoupleAccepted(

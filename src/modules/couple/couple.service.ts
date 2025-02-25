@@ -30,6 +30,20 @@ export class CoupleService {
       throw new NotFoundException(COUPLE_ERROR_MESSAGES.USER.NOT_FOUND);
     }
 
+    // 보낸 사람과 받는 사람이 같은 사람인지 체크
+    if (sender.id === receiver.id) {
+      throw new BadRequestException(COUPLE_ERROR_MESSAGES.USER.SAME_USER);
+    }
+
+    // 커플 상태 체크
+    if (sender.coupleStatus === CoupleStatus.COUPLED) {
+      throw new BadRequestException(COUPLE_ERROR_MESSAGES.COUPLE_STATUS.SENDER_ALREADY_COUPLED);
+    } 
+
+    if (receiver.coupleStatus === CoupleStatus.COUPLED) {
+      throw new BadRequestException(COUPLE_ERROR_MESSAGES.COUPLE_STATUS.RECEIVER_ALREADY_COUPLED);
+    } 
+
     // 성별 체크
     if (sender.gender === receiver.gender) {
       throw new BadRequestException(COUPLE_ERROR_MESSAGES.GENDER_MISMATCH);
@@ -40,11 +54,20 @@ export class CoupleService {
       where: [
         { sender: { id: senderId }, receiver: { id: receiver.id } },
         { sender: { id: receiver.id }, receiver: { id: senderId } }
-      ]
+      ],
+      order: {
+        createdAt: 'DESC'
+      }
     });
 
-    if (existingRequest) {
+    // 이미 커플 신청이 진행중인지 체크
+    if (existingRequest && existingRequest.status === CoupleRequestStatus.PENDING) {
       throw new BadRequestException(COUPLE_ERROR_MESSAGES.REQUEST.ALREADY_EXISTS);
+    }
+
+    // 이미 커플인지 체크
+    if (existingRequest && existingRequest.status === CoupleRequestStatus.ACCEPTED) {
+      throw new BadRequestException(COUPLE_ERROR_MESSAGES.COUPLE_STATUS.ALREADY_COUPLED);
     }
 
     // 새 요청 생성
