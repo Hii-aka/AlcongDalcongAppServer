@@ -8,6 +8,7 @@ import { winstonConfig } from 'src/logger/winston.config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 @Module({
   imports: [
     WinstonModule.forRoot(winstonConfig),
@@ -16,7 +17,7 @@ import { PassportModule } from '@nestjs/passport';
     JwtModule.register({}),
     TypeOrmModule.forFeature([User])],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [JwtStrategy, PassportModule]
+  providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
+  exports: [JwtStrategy, PassportModule, JwtRefreshStrategy]
 })
 export class AuthModule {}

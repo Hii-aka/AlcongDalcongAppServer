@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CoupleController } from './couple.controller';
-
 describe('CoupleController', () => {
   let controller: CoupleController;
 

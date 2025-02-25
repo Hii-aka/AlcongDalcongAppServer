@@ -13,7 +13,7 @@ import { LoginUser } from '../../core/decorators/login-user.decorator';
 import { PrincipalDto } from './dto/principal.dto';
 import { AUTH_API_MESSAGES, AUTH_LOG_MESSAGES, HTTP_STATUS } from 'src/constants';
 import { LoginRequestDto } from './dto/login-request.dto';
-
+import { SWAGGER_CONSTANTS } from 'src/constants/common/swagger.constant';
 @Controller('auth')
 export class AuthController {
     private logFormatter: AppLogFormatter;
@@ -59,7 +59,7 @@ export class AuthController {
 
     @Delete('/logout')
     @UseGuards(AuthGuard())
-    @ApiBearerAuth('access-token')
+    @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
     @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.LOGOUT })
     @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.LOGOUT , type: ApiResponseDto})
     async logout(@LoginUser() principalDto: PrincipalDto) {
@@ -75,7 +75,7 @@ export class AuthController {
 
     @Get('/me')
     @UseGuards(AuthGuard())
-    @ApiBearerAuth('access-token')
+    @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
     @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.ME })
     @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.ME , type: ApiResponseDto})
     async me(@LoginUser() principalDto: PrincipalDto) {
@@ -90,8 +90,8 @@ export class AuthController {
     }
 
     @Get('/refresh')
-    @UseGuards(AuthGuard())
-    @ApiBearerAuth('access-token')
+    @UseGuards(AuthGuard('jwt-refresh'))
+    @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
     @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.TOKEN_REFRESH })
     @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.TOKEN_REFRESH , type: ApiResponseDto})
     async refresh(@LoginUser() principalDto: PrincipalDto) {

@@ -101,12 +101,41 @@ export class AuthService {
     }
 
     async refreshToken(principalDto: PrincipalDto): Promise<Record<string, string>> {
-        const { accessToken, refreshToken } = await this.getTokens({ email: principalDto.email });
-        await this.updateHashedRefreshToken(principalDto.id, refreshToken);
+        if (!principalDto.refreshToken) {
+            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.REFRESH_TOKEN_NOT_FOUND);
+        }
+        const user = await this.userRepository.findOne({ where: { id: principalDto.id } });
+        if (!user) {
+            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
+        }
+        if (!user.hashedRefreshToken) {
+            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.REFRESH_TOKEN_NOT_FOUND);
+        }
+        const decodedRefreshToken = this.jwtService.verify(principalDto.refreshToken, {
+            secret: this.configService.get(AUTH_CONFIG.JWT.SECRET_KEY),
+        });
+        const expirationTime = new Date(decodedRefreshToken['exp'] * 1000);
+        const now = new Date();
+        const timeUntilExpiration = expirationTime.getTime() - now.getTime();
+        const tenMinutesInMs = 10 * 60 * 1000;
+        if (timeUntilExpiration < tenMinutesInMs) {
+            const { accessToken, refreshToken } = await this.getTokens({ email: principalDto.email });
+            await this.updateHashedRefreshToken(principalDto.id, refreshToken);
+            return {
+                accessToken,
+                refreshToken,
+            };
+        }
+        
+
+        const accessToken = this.jwtService.sign({ email: principalDto.email }, {
+            secret: this.configService.get(AUTH_CONFIG.JWT.SECRET_KEY),
+            expiresIn: this.configService.get(AUTH_CONFIG.JWT.ACCESS_EXPIRES_IN),
+        });
+        await this.updateHashedRefreshToken(principalDto.id, principalDto.refreshToken);
 
         return {
             accessToken,
-            refreshToken,
         };
     }
 

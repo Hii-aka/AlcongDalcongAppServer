@@ -1,11 +1,12 @@
-import { Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Column } from "typeorm";
 
 import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../auth/user.entity";
 import { CoupleRequestStatus } from "./enums/couple-request-status.enum";
+import { CommonEntity } from "src/audit/base.entity";
 
 @Entity()
-export class CoupleRequest {
+export class CoupleRequest extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,10 +27,4 @@ export class CoupleRequest {
     type: 'date',
   })
   firstMetDate: Date;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn() 
-  updatedAt: Date;
 } 

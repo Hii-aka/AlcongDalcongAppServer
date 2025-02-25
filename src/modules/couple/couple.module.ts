@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { CoupleService } from './couple.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoupleRequest } from './couple-request.entity';
-import { CouplesController } from './couple.controller';
+import { CoupleController } from './couple.controller';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from 'src/logger/winston.config';
 import { AuthModule } from '../auth/auth.module';
@@ -13,7 +13,7 @@ import { User } from '../auth/user.entity';
     TypeOrmModule.forFeature([CoupleRequest, User]),
     AuthModule
   ],
-  controllers: [CouplesController],
+  controllers: [CoupleController],
   providers: [CoupleService]
 })
 export class CoupleModule {}

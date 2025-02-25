@@ -4,6 +4,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SWAGGER_CONSTANTS } from './constants/common/swagger.constant';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
@@ -14,14 +15,14 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('알콩달콩 API')
     .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'JWT',
-      description: 'Enter JWT token',
-      in: 'header',
+      type: SWAGGER_CONSTANTS.BEARER_AUTH.type,
+      scheme: SWAGGER_CONSTANTS.BEARER_AUTH.scheme,
+      bearerFormat: SWAGGER_CONSTANTS.BEARER_AUTH.bearerFormat,
+      name: SWAGGER_CONSTANTS.BEARER_AUTH.name,
+      description: SWAGGER_CONSTANTS.BEARER_AUTH.description,
+      in: SWAGGER_CONSTANTS.BEARER_AUTH.in,
     },
-    'access-token')
+    SWAGGER_CONSTANTS.ACCESS_TOKEN)
     .build();
 
 
