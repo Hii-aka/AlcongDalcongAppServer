@@ -35,6 +35,9 @@ export class User extends CommonEntity {
         default: CoupleStatus.NOT_COUPLED
     })
     coupleStatus: CoupleStatus;
+
+    @Column({ nullable: true })
+    coupleId?: number;
     
     @Column({ nullable: true })
     hashedRefreshToken?: string;

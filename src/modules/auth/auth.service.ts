@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, UnauthorizedException, ForbiddenException, Inject } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -13,6 +13,8 @@ import { LoginServiceResponse } from './types/auth-service.types';
 import { PrincipalDto } from './dto/principal.dto';
 import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG } from 'src/constants';
 import { LoginRequestDto } from './dto/login-request.dto';
+import { CoupleRequest } from '../couple/couple-request.entity';
+import { CoupleStatus } from '../couple/enums/couple-status.enum';
 @Injectable()
 export class AuthService {
     constructor(
@@ -20,6 +22,8 @@ export class AuthService {
         private userRepository: Repository<User>,
         private jwtService: JwtService,
         private configService: ConfigService,
+        @InjectRepository(CoupleRequest)
+        private coupleRequestRepository: Repository<CoupleRequest>,
     ) {}
 
 
@@ -29,12 +33,39 @@ export class AuthService {
             throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
         }
 
+        let partner: User | null = null;
+        if (user.coupleStatus === CoupleStatus.COUPLED) {
+            const coupleRequest = await this.coupleRequestRepository.findOne({ where: { id: user.coupleId }, relations: ['sender', 'receiver'] });
+
+            if (!coupleRequest) {
+                return;
+            }
+
+            if (!coupleRequest.sender || !coupleRequest.receiver) {
+                return;
+            }
+
+            const sender = await coupleRequest.sender;
+            const receiver = await coupleRequest.receiver;
+
+            const partnerId = sender.id === user.id 
+                ? receiver.id 
+                : sender.id;
+            
+            partner = await this.userRepository.findOne({ where: { id: partnerId } });
+        }
+
+        const partnerWithoutPassword = { ...partner, 
+                                        password: undefined, 
+                                        hashedRefreshToken: undefined,
+                                    } as unknown as UserWithoutPasswordAndHashedRefreshToken;
+
         const userWithoutPasswordAndHashedRefreshToken = { ...user, 
                                                            password: undefined, 
                                                            hashedRefreshToken: undefined 
                                                         } as unknown as UserWithoutPasswordAndHashedRefreshToken;
 
-        return userWithoutPasswordAndHashedRefreshToken;
+        return { user: userWithoutPasswordAndHashedRefreshToken, partner: partnerWithoutPassword };
     }
     
 

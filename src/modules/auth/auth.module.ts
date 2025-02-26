@@ -9,13 +9,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { CoupleRequest } from '../couple/couple-request.entity';
 @Module({
   imports: [
     WinstonModule.forRoot(winstonConfig),
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
     JwtModule.register({}),
-    TypeOrmModule.forFeature([User])],
+    TypeOrmModule.forFeature([User, CoupleRequest])],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
   exports: [JwtStrategy, PassportModule, JwtRefreshStrategy]

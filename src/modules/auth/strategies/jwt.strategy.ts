@@ -27,6 +27,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (!user.hashedRefreshToken) {
             throw new UnauthorizedException('리프레시 토큰이 존재하지 않습니다.');
         }
-        return {id: user.id, email: user.email, hashedRefreshToken: user.hashedRefreshToken, gender: user.gender };
+        return {id: user.id, email: user.email, hashedRefreshToken: user.hashedRefreshToken, gender: user.gender, coupleId: user.coupleId };
     }   
 }
