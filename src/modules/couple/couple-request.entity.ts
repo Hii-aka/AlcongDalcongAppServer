@@ -10,10 +10,10 @@ export class CoupleRequest extends CommonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User,{lazy: true})
   sender: User;
 
-  @ManyToOne(() => User) 
+  @ManyToOne(() => User,{lazy: true}) 
   receiver: User;
 
   @Column({

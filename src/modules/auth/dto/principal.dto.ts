@@ -11,6 +11,8 @@ export class PrincipalDto {
     refreshToken?: string;
     @ApiProperty({ description: '유저 성별' })
     gender: string;
+    @ApiProperty({ description: '유저 커플 아이디' })
+    coupleId?: number;
 }
 
 

@@ -117,7 +117,7 @@ export class CoupleService {
       // 예: 두 유저의 상태 업데이트
       await this.userRepository.update(
         { id: In([coupleRequest.sender.id, coupleRequest.receiver.id]) },
-        { coupleStatus: CoupleStatus.COUPLED }
+        { coupleStatus: CoupleStatus.COUPLED, coupleId: coupleRequest.id }
       );
     }
 
