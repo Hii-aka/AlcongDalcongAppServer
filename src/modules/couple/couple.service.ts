@@ -101,7 +101,7 @@ export class CoupleService {
     requestId: number, 
     receiverId: number,
     accept: boolean
-  ): Promise<{ message: string }> {
+  ): Promise<{ coupleId: number }> {
     const coupleRequest = await this.coupleRequestRepository.findOne({
       where: { 
         id: requestId,
@@ -140,7 +140,7 @@ export class CoupleService {
     }
 
     return {
-      message: COUPLE_SERVICE.MESSAGES.SUCCESS.RESPOND_TO_COUPLE_REQUEST,
+      coupleId: coupleRequest.id,
     };
   }
 
