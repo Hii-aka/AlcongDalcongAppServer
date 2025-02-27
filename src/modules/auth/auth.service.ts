@@ -5,26 +5,35 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-
+import { AppLogFormatter } from 'src/logger/log.formatter';
 
 import { ConfigService } from '@nestjs/config';
 import { UserWithoutPassword, UserWithoutPasswordAndHashedRefreshToken } from './types/auth.type';
 import { LoginServiceResponse } from './types/auth-service.types';
 import { PrincipalDto } from './dto/principal.dto';
-import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG } from 'src/constants';
+import { DB_ERROR_CODES, AUTH_ERROR_MESSAGES, AUTH_SERVICE, AUTH_CONFIG, AUTH_LOG_MESSAGES } from 'src/constants';
 import { LoginRequestDto } from './dto/login-request.dto';
 import { CoupleRequest } from '../couple/couple-request.entity';
 import { CoupleStatus } from '../couple/enums/couple-status.enum';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { COUPLE_ERROR_MESSAGES } from 'src/constants/messages/couple/error.message';
+import { CoupleRequestStatus } from '../couple/enums/couple-request-status.enum';
 @Injectable()
 export class AuthService {
+    private logFormatter: AppLogFormatter;
+
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        private jwtService: JwtService,
-        private configService: ConfigService,
         @InjectRepository(CoupleRequest)
         private coupleRequestRepository: Repository<CoupleRequest>,
-    ) {}
+        private jwtService: JwtService,
+        private configService: ConfigService,
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    ) {
+        this.logFormatter = new AppLogFormatter();
+    }
 
 
     async getMe(principalDto: PrincipalDto) {
@@ -195,5 +204,35 @@ export class AuthService {
         } catch (error) {
             throw new InternalServerErrorException(AUTH_ERROR_MESSAGES.SERVER.INTERNAL_ERROR);
         }
+    }
+
+    async disconnect(principalDto: PrincipalDto, id: number): Promise<{ coupleId: number }> {
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.DISCONNECT, { principalDto });
+        this.logger.log(logPayload);
+        const user = await this.userRepository.findOne({ where: { id: principalDto.id } });
+        if (!user) {
+            throw new UnauthorizedException(AUTH_ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
+        }
+        const coupleRequest = await this.coupleRequestRepository.findOne({ where: { id } });
+        if (!coupleRequest) {
+            throw new UnauthorizedException(COUPLE_ERROR_MESSAGES.REQUEST.NOT_FOUND);
+        }
+        const [sender, receiver] = await Promise.all([
+            coupleRequest.sender,
+            coupleRequest.receiver
+        ]);
+
+        if (!sender?.id || !receiver?.id) {
+            throw new UnauthorizedException('Sender or Receiver not found');
+        }
+
+        await Promise.all([
+            this.userRepository.update(sender.id, { coupleStatus: CoupleStatus.NOT_COUPLED, coupleId: undefined as unknown as number }),
+            this.userRepository.update(receiver.id, { coupleStatus: CoupleStatus.NOT_COUPLED, coupleId: undefined as unknown as number }),
+            this.coupleRequestRepository.update(coupleRequest.id, { status: CoupleRequestStatus.REJECTED })
+        ]);
+        return {
+            coupleId: coupleRequest.id,
+        };
     }
 }

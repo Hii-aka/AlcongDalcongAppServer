@@ -1,4 +1,4 @@
-import { Controller, Param, Post, UseGuards, Request as Req, Body, Inject, Get } from '@nestjs/common';
+import { Controller, Param, Post, UseGuards, Request as Req, Body, Inject, Get, Delete } from '@nestjs/common';
 import { CoupleService } from './couple.service';
 import { AuthGuard } from '@nestjs/passport';
 import { AppLogFormatter } from 'src/logger/log.formatter';

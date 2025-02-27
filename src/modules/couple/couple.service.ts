@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CoupleRequest } from './couple-request.entity';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,14 +9,21 @@ import { COUPLE_ERROR_MESSAGES } from 'src/constants/messages/couple/error.messa
 import { COUPLE_SERVICE } from 'src/constants/messages/couple/service.message';
 import { CreateCouleRequestDto } from './dto/create-couple-request.dto';
 import { CoupleResponseDto } from './dto/couple-response.dto';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { AppLogFormatter } from 'src/logger/log.formatter';
 @Injectable()
 export class CoupleService {
+  private logFormatter: AppLogFormatter;
   constructor(
     @InjectRepository(CoupleRequest)
     private coupleRequestRepository: Repository<CoupleRequest>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {
+    this.logFormatter = new AppLogFormatter();
+  }
 
   // 커플 신청
   async createCoupleRequest(senderId: number, { receiverEmail, firstMetDate }: CreateCouleRequestDto): Promise<{ message: string }> {
@@ -112,11 +119,16 @@ export class CoupleService {
       CoupleRequestStatus.ACCEPTED : 
       CoupleRequestStatus.REJECTED;
 
+    const [sender, receiver] = await Promise.all([
+      coupleRequest.sender,
+      coupleRequest.receiver
+    ]);
+
     if (accept) {
       // 커플이 성사되면 추가 로직 수행
       // 예: 두 유저의 상태 업데이트
       await this.userRepository.update(
-        { id: In([coupleRequest.sender.id, coupleRequest.receiver.id]) },
+        { id: In([sender.id, receiver.id]) },
         { coupleStatus: CoupleStatus.COUPLED, coupleId: coupleRequest.id }
       );
     }
@@ -155,25 +167,33 @@ export class CoupleService {
       throw new NotFoundException(COUPLE_ERROR_MESSAGES.REQUEST.NOT_FOUND);
     }
 
-    return coupleRequests.map(coupleRequest => {
+    return Promise.all(coupleRequests.map(async (coupleRequest) => {
+      const [sender, receiver] = await Promise.all([
+        coupleRequest.sender,
+        coupleRequest.receiver
+      ]);
+      
+      const logPayload = this.logFormatter.format('커플 요청 목록 조회', { coupleRequest });
+      this.logger.log(logPayload);
+      
       return {
         id: coupleRequest.id,
         sender: {
-          id: coupleRequest.sender.id,
-          email: coupleRequest.sender.email,
-          nickname: coupleRequest.sender.nickname || '',
+          id: sender.id,
+          email: sender.email,
+          nickname: sender.nickname || '',
         },
         receiver: {
-          id: coupleRequest.receiver.id,
-          email: coupleRequest.receiver.email,
-          nickname: coupleRequest.receiver.nickname || '' ,
+          id: receiver.id,
+          email: receiver.email,
+          nickname: receiver.nickname || '',
         },
         status: coupleRequest.status,
         firstMetDate: coupleRequest.firstMetDate,
         createdAt: coupleRequest.createdAt,
         updatedAt: coupleRequest.updatedAt,
       };
-    });
+    }));
   }
 
   async getCoupleAccepted(userId: number): Promise<CoupleResponseDto> {

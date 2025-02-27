@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, ValidationPipe, Get, UseGuards, Delete } from '@nestjs/common';
+import { Body, Controller, Inject, Post, ValidationPipe, Get, UseGuards, Delete, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -103,6 +103,24 @@ export class AuthController {
             AUTH_API_MESSAGES.SUCCESS.TOKEN_REFRESH,
             response,
             HTTP_STATUS.SUCCESS.OK,
+        );
+    }
+
+    @Delete('/disconnect/:id')
+    @UseGuards(AuthGuard())
+    @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
+    @ApiOperation({ summary: AUTH_API_MESSAGES.DESCRIPTION.DISCONNECT })
+    @ApiCreatedResponse({ description: AUTH_API_MESSAGES.SUCCESS.DISCONNECT , type: ApiResponseDto})
+    async disconnect(
+        @LoginUser() principalDto: PrincipalDto, 
+        @Param('id') id: number) {
+        const logPayload = this.logFormatter.format(AUTH_LOG_MESSAGES.API_CALLED.DISCONNECT, { principalDto, id });
+        this.logger.log(logPayload);
+        const response = await this.authService.disconnect(principalDto, id);
+        return ApiResponseDto.success(
+            AUTH_API_MESSAGES.SUCCESS.DISCONNECT,
+            response,
+           HTTP_STATUS.SUCCESS.OK,
         );
     }
 }
