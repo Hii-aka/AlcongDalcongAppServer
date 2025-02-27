@@ -10,6 +10,7 @@ import { Logger } from 'winston';
 import { LLMModule } from './modules/llm/llm.module';
 import { CoupleModule } from './modules/couple/couple.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
+import { DateCalendarModule } from './modules/date-calendar/date-calendar.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
     LLMModule,
     CoupleModule,
     WinstonModule.forRoot(winstonConfig),
+    DateCalendarModule,
   ],
   controllers: [],
   providers: [
