@@ -7,12 +7,14 @@ export const AUTH_LOG_MESSAGES = {
       PASSWORD_RESET: 'password reset 호출',
       EMAIL_VERIFY: 'email verify 호출',
       ME: 'me 호출',
+      DISCONNECT: 'disconnect 호출',
     },
     SERVICE: {
       USER_CREATED: '사용자 생성 완료',
       TOKEN_GENERATED: '토큰 생성 완료',
       TOKEN_REFRESHED: '토큰 갱신 완료',
       USER_LOGGED_OUT: '사용자 로그아웃 완료',
+      DISCONNECTED: '커플 연결 해제 완료',
     },
     ERROR: {
       AUTH_FAILED: '인증 실패',

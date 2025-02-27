@@ -7,6 +7,7 @@ export const AUTH_API_MESSAGES = {
       PASSWORD_RESET: '비밀번호 재설정 성공',
       EMAIL_VERIFY: '이메일 인증 성공',
       ME: '사용자 정보 조회 성공',
+      DISCONNECT: '사용자 연결 해제 성공',
     },
     DESCRIPTION: {
       SIGNUP: '새로운 사용자를 등록합니다',
@@ -16,6 +17,7 @@ export const AUTH_API_MESSAGES = {
       PASSWORD_RESET: '비밀번호를 재설정합니다',
       EMAIL_VERIFY: '이메일 인증을 수행합니다',
       ME: '사용자 정보를 조회합니다',
+      DISCONNECT: '사용자 연결 해제',
     },
     SWAGGER: {
       TAG: '인증',

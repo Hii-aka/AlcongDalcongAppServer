@@ -4,6 +4,7 @@ export const AUTH_SERVICE = {
         SIGNUP: '회원가입이 완료되었습니다',
         LOGOUT: '로그아웃이 완료되었습니다',
         TOKEN_REFRESH: '토큰이 갱신되었습니다',
+        DISCONNECT: '커플 연결 해제 완료',
       },
     },
     LOG: {
