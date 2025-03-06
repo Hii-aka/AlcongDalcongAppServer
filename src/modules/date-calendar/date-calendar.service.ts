@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { DateCalendar } from './date-calendar.entity';
@@ -20,7 +20,7 @@ export class DateCalendarService {
         this.logFormatter = new AppLogFormatter();
     }
 
-    async createDateCalendar(coupleId?: number, dto?: CreateDateCalendarDto): Promise<{ id: number }> {
+    async createDateCalendar(coupleId?: number, dto?: CreateDateCalendarDto): Promise<{ id: number, date: Date }> {
         const logPayload = this.logFormatter.format(DATE_CALENDAR_SERVICE_MESSAGES.API_CALLED.CREATE, { dto });
         this.logger.log(logPayload);    
         if(!coupleId) {
@@ -33,6 +33,7 @@ export class DateCalendarService {
         await this.dateCalendarRepository.save(dateCalendar);
         return {
             id: dateCalendar.id,
+            date: dateCalendar.date,
         };
     }
 
@@ -55,5 +56,26 @@ export class DateCalendarService {
             },
         });
         return dateCalendars;
+    }
+
+    async getDateCalendar(coupleId?: number, date?: string): Promise<DateCalendar[]> {
+        const logPayload = this.logFormatter.format(DATE_CALENDAR_SERVICE_MESSAGES.API_CALLED.GET_DATE_CALENDAR, { date });
+        this.logger.log(logPayload);
+        if(!coupleId) {
+            throw new BadRequestException(DATE_CALENDAR_ERROR_MESSAGES.ERROR.COUPLE_ID_REQUIRED);
+        }
+        if(!date) {
+            throw new BadRequestException(DATE_CALENDAR_ERROR_MESSAGES.ERROR.DATE_REQUIRED);
+        }
+        const dateCalendar = await this.dateCalendarRepository.find({
+            where: {
+                coupleId: coupleId,
+                date: new Date(date),
+            },
+        });
+        if(!dateCalendar) {
+            throw new NotFoundException(DATE_CALENDAR_ERROR_MESSAGES.ERROR.DATE_CALENDAR_NOT_FOUND);
+        }
+        return dateCalendar;
     }
 }

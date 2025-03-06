@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject, UseGuards, Get, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Inject, UseGuards, Get, Query, BadRequestException, Param } from '@nestjs/common';
 import { DateCalendarService } from './date-calendar.service';
 import { CreateDateCalendarDto } from './dto/create-date-calendar.dto';
 import { DATE_CALENDAR_LOG_MESSAGES } from '../../constants/messages/date-calendar/api.message';
@@ -8,7 +8,7 @@ import { Logger } from 'winston';
 import { ApiResponseDto } from 'src/api/api.response.dto';
 import { HTTP_STATUS } from 'src/constants';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiCreatedResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ApiBody } from '@nestjs/swagger';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ApiOperation } from '@nestjs/swagger';
@@ -16,7 +16,6 @@ import { SWAGGER_CONSTANTS } from 'src/constants/common/swagger.constant';
 import { PrincipalDto } from 'src/modules/auth/dto/principal.dto';
 import { LoginUser } from 'src/core/decorators/login-user.decorator';
 import { GetAllDateCalendarsDto } from './dto/get-all-date-calendar.dto';
-import { DATE_CALENDAR_ERROR_MESSAGES } from 'src/constants/messages/date-calendar/error.message';
 @Controller('date-calendars')
 export class DateCalendarController {
     private logFormatter: AppLogFormatter;
@@ -60,6 +59,22 @@ export class DateCalendarController {
         return ApiResponseDto.success(
             DATE_CALENDAR_LOG_MESSAGES.SUCCESS.GET_ALL,
             response,
+            HTTP_STATUS.SUCCESS.OK
+        );
+    }
+
+    @ApiOperation({ summary: DATE_CALENDAR_LOG_MESSAGES.API_CALLED.GET_DATE_CALENDAR })
+    @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
+    @ApiParam({ name: 'date', description: '날짜' })
+    @UseGuards(AuthGuard())
+    @Get('/:date')
+    async getDateCalendar(@LoginUser() principalDto: PrincipalDto, @Param('date') date: string) {
+        const logPayload = this.logFormatter.format(DATE_CALENDAR_LOG_MESSAGES.API_CALLED.GET_DATE_CALENDAR, { principalDto });
+        this.logger.log(logPayload);
+        const response = await this.dateCalendarService.getDateCalendar(principalDto.coupleId, date);
+        return ApiResponseDto.success(
+            DATE_CALENDAR_LOG_MESSAGES.SUCCESS.GET_DATE_CALENDAR, 
+            response, 
             HTTP_STATUS.SUCCESS.OK
         );
     }
