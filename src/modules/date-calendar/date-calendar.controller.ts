@@ -78,4 +78,20 @@ export class DateCalendarController {
             HTTP_STATUS.SUCCESS.OK
         );
     }
+
+    @ApiOperation({ summary: DATE_CALENDAR_LOG_MESSAGES.API_CALLED.GET_DATE_CALENDAR_BY_ID })
+    @ApiBearerAuth(SWAGGER_CONSTANTS.ACCESS_TOKEN)
+    @ApiParam({ name: 'id', description: 'id' })
+    @UseGuards(AuthGuard())
+    @Get('/detail/:id')
+    async getDateCalendarById(@LoginUser() principalDto: PrincipalDto, @Param('id') id: string) {   
+        const logPayload = this.logFormatter.format(DATE_CALENDAR_LOG_MESSAGES.API_CALLED.GET_DATE_CALENDAR_BY_ID, { principalDto });
+        this.logger.log(logPayload);
+        const response = await this.dateCalendarService.getDateCalendarById(principalDto.coupleId, id);
+        return ApiResponseDto.success(
+            DATE_CALENDAR_LOG_MESSAGES.SUCCESS.GET_DATE_CALENDAR_BY_ID,
+            response,
+            HTTP_STATUS.SUCCESS.OK
+        );
+    }
 }

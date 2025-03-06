@@ -78,4 +78,25 @@ export class DateCalendarService {
         }
         return dateCalendar;
     }
+
+    async getDateCalendarById(coupleId?: number, id?: string): Promise<DateCalendar> {
+        const logPayload = this.logFormatter.format(DATE_CALENDAR_SERVICE_MESSAGES.API_CALLED.GET_DATE_CALENDAR_BY_ID, { id });
+        this.logger.log(logPayload);
+        if(!coupleId) {
+            throw new BadRequestException(DATE_CALENDAR_ERROR_MESSAGES.ERROR.COUPLE_ID_REQUIRED);
+        }
+        if(!id) {
+            throw new BadRequestException(DATE_CALENDAR_ERROR_MESSAGES.ERROR.ID_REQUIRED);
+        }
+        const dateCalendar = await this.dateCalendarRepository.findOne({
+            where: {
+                coupleId: coupleId,
+                id: parseInt(id),
+            },
+        });
+        if(!dateCalendar) {
+            throw new NotFoundException(DATE_CALENDAR_ERROR_MESSAGES.ERROR.DATE_CALENDAR_NOT_FOUND);
+        }
+        return dateCalendar;
+    }   
 }
