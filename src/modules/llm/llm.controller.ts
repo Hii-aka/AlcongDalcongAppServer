@@ -1,9 +1,10 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { LLMClient } from './llm.client';
 import { DateCourseRequest } from './dto/date-course.request';
 import { TypeConverter } from '../../common/utils/type-converter';
+import LlmChatRequest from './dto/llm-chat.request';
 
 @ApiTags('LLM')
 @Controller('llm')
@@ -11,7 +12,8 @@ export class LLMController {
   private readonly template: string =
     process.env.LLM_DATE_COURSE_TEMPLATE || '데이트 코스 템플릿';
 
-  constructor(private readonly llmClient: LLMClient) {}
+  constructor(private readonly llmClient: LLMClient) {
+  }
 
   @ApiOperation({
     summary: '데이트 코스 추천',
@@ -83,5 +85,22 @@ export class LLMController {
     });
 
     response.on('close', () => subscription.unsubscribe());
+  }
+
+  @ApiOperation({
+    summary: 'LLM에게 질문',
+    description: 'LLM API를 통해 질문에 대한 답을 받을 수 있습니다.',
+  })
+  @Post('/chat')
+  requestChatLLM(
+    @Body() llmChatRequest: LlmChatRequest,
+    @Res() response: Response,
+  ): void {
+    this.proceedStreamingFromExternalApi(
+      response,
+      this.llmClient,
+      null,
+      llmChatRequest.question,
+    );
   }
 }
