@@ -9,8 +9,9 @@ import LlmChatRequest from './dto/llm-chat.request';
 @ApiTags('LLM')
 @Controller('llm')
 export class LLMController {
-  private readonly template: string =
+  private readonly TEMPLATE: string =
     process.env.LLM_DATE_COURSE_TEMPLATE || '데이트 코스 템플릿';
+  private readonly DEFAULT_OPTION: string = 'No option. Just answer about request';
 
   constructor(private readonly llmClient: LLMClient) {
   }
@@ -64,7 +65,7 @@ export class LLMController {
       response,
       this.llmClient,
       optionsToTransmit,
-      this.template,
+      this.TEMPLATE,
     );
   }
 
@@ -99,7 +100,7 @@ export class LLMController {
     this.proceedStreamingFromExternalApi(
       response,
       this.llmClient,
-      null,
+      { option: [this.DEFAULT_OPTION] },
       llmChatRequest.question,
     );
   }
